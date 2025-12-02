@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShoppingCart, Bell, User } from 'lucide-react';
+import { Home, Heart, ShoppingCart, Receipt, User } from 'lucide-react';
 
 const BottomNavigation = () => {
   const location = useLocation();
@@ -7,8 +7,9 @@ const BottomNavigation = () => {
 
   const navItems = [
     { path: '/home', icon: Home, label: '홈' },
+    { path: '/wishlist', icon: Heart, label: '관심목록' },
     { path: '/cart', icon: ShoppingCart, label: '장바구니' },
-    { path: '/notifications', icon: Bell, label: '알림' },
+    { path: '/order/history', icon: Receipt, label: '결제내역' },
     { path: '/mypage', icon: User, label: '마이페이지' },
   ];
 
