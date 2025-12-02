@@ -28,6 +28,7 @@ import CustomerServiceInquiryPage from './pages/CustomerServiceInquiryPage';
 import CustomerServiceConfirmPage from './pages/CustomerServiceConfirmPage';
 import ItemDetailPage from './pages/ItemDetailPage';
 import WishlistPage from './pages/WishlistPage';
+import ScreenshotGuidePage from './pages/ScreenshotGuidePage';
 
 // Components
 import BottomNavigation from './components/BottomNavigation';
@@ -61,6 +62,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-white mobile-container">
         <Routes>
+          <Route path="/screenshots" element={<ScreenshotGuidePage />} />
           <Route path="/" element={<SplashPage />} />
           <Route 
             path="/signin" 
