@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
@@ -41,15 +42,21 @@ const SignInPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white px-6 py-12 pb-24">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-900">Sign In</h1>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="px-4 py-6 flex items-center">
+        <button onClick={() => navigate(-1)} className="mr-4">
+          <ArrowLeft size={24} className="text-gray-700" />
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900 flex-1 text-center mr-8">로그인</h1>
+      </div>
 
+      <div className="px-6 pb-24">
         <form onSubmit={handleEmailSignIn} className="space-y-4 mb-6">
           <div>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="이메일"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -60,7 +67,7 @@ const SignInPage = () => {
           <div>
             <input
               type="password"
-              placeholder="Password"
+              placeholder="비밀번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -68,8 +75,8 @@ const SignInPage = () => {
             />
           </div>
 
-          <Link to="/forgot-password" className="text-sm text-primary block text-right">
-            Forgot your password?
+          <Link to="/forgot-password" className="text-sm text-gray-500 block text-left">
+            비밀번호를 잊으셨나요?
           </Link>
 
           {error && (
@@ -79,39 +86,45 @@ const SignInPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50"
+            className="w-full py-4 bg-primary text-white rounded-lg font-bold text-lg disabled:opacity-50 mt-6"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
 
-        <div className="relative my-6">
+        <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">OR</span>
+            <span className="px-4 bg-white text-gray-500">OR</span>
           </div>
         </div>
 
-        <div className="mb-6">
-          <p className="text-center text-gray-600 mb-4">Sign In using</p>
+        <div className="mb-8">
+          <p className="text-center text-gray-500 mb-4">소셜 로그인</p>
           <div className="flex justify-center gap-4">
+            {/* Naver */}
+            <button className="w-14 h-14 bg-[#03C75A] rounded-full flex items-center justify-center text-white text-xl font-bold">
+              N
+            </button>
+            {/* Google */}
             <button
               onClick={handleGoogleSignIn}
-              className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold"
+              className="w-14 h-14 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center text-xl font-bold text-gray-700"
             >
               G
             </button>
-            <button className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
-              N
+            {/* Kakao */}
+            <button className="w-14 h-14 bg-[#FEE500] rounded-full flex items-center justify-center text-gray-900 text-xs font-bold">
+              TALK
             </button>
           </div>
         </div>
 
         <div className="text-center">
-          <Link to="/signup" className="text-primary font-medium">
-            Need An Account?
+          <Link to="/signup" className="text-gray-500">
+            계정이 없으신가요?
           </Link>
         </div>
       </div>

@@ -7,11 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#22C55E', // 메인 그린 컬러
-          dark: '#16A34A',
-          light: '#4ADE80',
-        },
+        primary: '#1E6E68', // 메인 틸 컬러
         secondary: {
           DEFAULT: '#F3F4F6', // 그레이 배경
           dark: '#E5E7EB',

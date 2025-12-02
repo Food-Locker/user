@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
 import useSeatStore from '../store/seatStore';
+import SeatSelectionModal from '../components/SeatSelectionModal';
 
 const PaymentPage = () => {
   const navigate = useNavigate();
   const { items, getTotal, clearCart } = useCartStore();
-  const { seatBlock, seatNumber } = useSeatStore();
+  const { seatBlock, seatNumber, hasSeat } = useSeatStore();
   const [deliveryMethod, setDeliveryMethod] = useState('locker');
   const [loading, setLoading] = useState(false);
+  const [showSeatModal, setShowSeatModal] = useState(false);
 
   const menuTotal = getTotal();
   const deliveryFee = deliveryMethod === 'locker' ? 1000 : deliveryMethod === 'seat' ? 2500 : 0;
@@ -16,8 +18,9 @@ const PaymentPage = () => {
   const finalTotal = menuTotal + deliveryFee - discount;
 
   const handlePayment = async () => {
-    if (!seatBlock || !seatNumber) {
-      alert('좌석 정보를 먼저 입력해주세요.');
+    // 좌석 정보가 없으면 모달 표시
+    if (!hasSeat()) {
+      setShowSeatModal(true);
       return;
     }
 
@@ -134,11 +137,19 @@ const PaymentPage = () => {
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800">
-            좌석 정보: {seatBlock}블록 {seatNumber}번
-          </p>
-        </div>
+        {hasSeat() ? (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
+              좌석 정보: {seatBlock}블록 {seatNumber}번
+            </p>
+          </div>
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p className="text-sm text-yellow-800">
+              ⚠️ 결제하기 전에 좌석 정보를 입력해주세요.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="px-4 pb-4">
@@ -150,6 +161,13 @@ const PaymentPage = () => {
           {loading ? '결제 처리 중...' : '결제하기'}
         </button>
       </div>
+
+      {/* 좌석 선택 모달 */}
+      <SeatSelectionModal 
+        isOpen={showSeatModal}
+        onClose={() => setShowSeatModal(false)}
+        required={true}
+      />
     </div>
   );
 };

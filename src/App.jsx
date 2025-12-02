@@ -28,14 +28,11 @@ import ItemDetailPage from './pages/ItemDetailPage';
 import WishlistPage from './pages/WishlistPage';
 
 // Components
-import SeatSelectionModal from './components/SeatSelectionModal';
 import BottomNavigation from './components/BottomNavigation';
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { seatBlock, seatNumber, hasSeat } = useSeatStore();
-  const [showSeatModal, setShowSeatModal] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -45,13 +42,6 @@ function App() {
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    // 로그인된 사용자가 있고 좌석 정보가 없으면 좌석 선택 모달 표시
-    if (user && !hasSeat() && !loading) {
-      setShowSeatModal(true);
-    }
-  }, [user, loading, hasSeat]);
 
   if (loading) {
     return (
@@ -153,15 +143,6 @@ function App() {
             element={user ? <WishlistPage /> : <Navigate to="/signin" />} 
           />
         </Routes>
-
-        {/* 좌석 선택 모달 */}
-        {user && showSeatModal && (
-          <SeatSelectionModal 
-            isOpen={showSeatModal}
-            onClose={() => setShowSeatModal(false)}
-            required={true}
-          />
-        )}
 
         {/* Bottom Navigation - 인증된 페이지에서만 표시 */}
         {user && !isAuthPage && <BottomNavigation />}

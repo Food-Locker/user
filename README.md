@@ -30,19 +30,37 @@
 git clone [repository-url]
 cd food-locker-user
 npm install
-2. Environment Setup (.env)
-프로젝트 루트에 .env 파일을 생성하고 Firebase 설정 정보를 입력하세요.
+```
 
-코드 스니펫
+### 2. Environment Setup (.env)
+프로젝트 루트에 `.env` 파일을 생성하고 Firebase 설정 정보를 입력하세요.
 
+**방법 1: 예시 파일 복사**
+```bash
+cp env.example .env
+```
+
+**방법 2: 직접 생성**
+프로젝트 루트에 `.env` 파일을 생성하고 아래 내용을 입력하세요:
+
+```env
 VITE_FIREBASE_API_KEY=your_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
-...
-3. Run Development Server
-Bash
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
 
+> **Firebase 설정 값 확인 방법:**
+> 1. [Firebase Console](https://console.firebase.google.com) 접속
+> 2. 프로젝트 선택 > 프로젝트 설정 (⚙️ 아이콘)
+> 3. 일반 탭 > 내 앱 > 웹 앱에서 설정 값 확인
+
+### 3. Run Development Server
+```bash
 npm run dev
+```
 📂 Project Structure
 /src
 ├── /assets         # 이미지 및 정적 파일

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
@@ -8,6 +9,8 @@ const SignUpPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [newsletter, setNewsletter] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,12 +21,12 @@ const SignUpPage = () => {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('비밀번호가 일치하지 않습니다');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('비밀번호는 최소 6자 이상이어야 합니다');
       return;
     }
 
@@ -55,15 +58,21 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white px-6 py-12 pb-24">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-900">Sign Up</h1>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="px-4 py-6 flex items-center">
+        <button onClick={() => navigate(-1)} className="mr-4">
+          <ArrowLeft size={24} className="text-gray-700" />
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900 flex-1 text-center mr-8">회원가입</h1>
+      </div>
 
+      <div className="px-6 pb-24">
         <form onSubmit={handleEmailSignUp} className="space-y-4 mb-6">
           <div>
             <input
               type="text"
-              placeholder="Name"
+              placeholder="이름"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -74,7 +83,7 @@ const SignUpPage = () => {
           <div>
             <input
               type="email"
-              placeholder="Email Id or Username"
+              placeholder="이메일"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -82,38 +91,52 @@ const SignUpPage = () => {
             />
           </div>
 
-          <div>
+          <div className="relative">
             <input
-              type="password"
-              placeholder="Password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="비밀번호"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
 
-          <div>
+          <div className="relative">
             <input
-              type="password"
-              placeholder="Confirm Password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="비밀번호 확인"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+            >
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-start">
             <input
               type="checkbox"
               id="newsletter"
               checked={newsletter}
               onChange={(e) => setNewsletter(e.target.checked)}
-              className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+              className="w-5 h-5 mt-1 text-primary border-gray-300 rounded focus:ring-primary"
             />
-            <label htmlFor="newsletter" className="ml-2 text-sm text-gray-600">
-              Yes, I want to receive discounts, loyalty offers and other updates.
+            <label htmlFor="newsletter" className="ml-2 text-sm text-gray-500">
+              할인, 적립 혜택 및 기타 업데이트를 받고 싶습니다.
             </label>
           </div>
 
@@ -124,32 +147,38 @@ const SignUpPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white rounded-lg font-medium disabled:opacity-50"
+            className="w-full py-4 bg-primary text-white rounded-lg font-bold text-lg disabled:opacity-50 mt-6"
           >
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? '계정 생성 중...' : '계정 만들기'}
           </button>
         </form>
 
-        <div className="relative my-6">
+        <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">OR</span>
+            <span className="px-4 bg-white text-gray-500">OR</span>
           </div>
         </div>
 
-        <div className="mb-6">
-          <p className="text-center text-gray-600 mb-4">Sign Up using</p>
+        <div className="mb-8">
+          <p className="text-center text-gray-500 mb-4">소셜 회원가입</p>
           <div className="flex justify-center gap-4">
+            {/* Naver */}
+            <button className="w-14 h-14 bg-[#03C75A] rounded-full flex items-center justify-center text-white text-xl font-bold">
+              N
+            </button>
+            {/* Google */}
             <button
               onClick={handleGoogleSignUp}
-              className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-bold"
+              className="w-14 h-14 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center text-xl font-bold text-gray-700"
             >
               G
             </button>
-            <button className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
-              N
+            {/* Kakao */}
+            <button className="w-14 h-14 bg-[#FEE500] rounded-full flex items-center justify-center text-gray-900 text-xs font-bold">
+              TALK
             </button>
           </div>
         </div>

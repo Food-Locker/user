@@ -21,14 +21,24 @@ const SplashPage = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-primary mb-4">Food Locker</h1>
-        <div className="w-32 h-32 mx-auto mb-8 bg-primary rounded-full flex items-center justify-center">
-          <span className="text-white text-6xl">⚾</span>
-        </div>
-        <p className="text-gray-600">야구장 음식 주문 서비스</p>
-      </div>
+    <div 
+      className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden"
+      style={{ 
+        backgroundColor: '#1E6E68',
+      }}
+    >
+      {/* 스플래시 이미지 */}
+      <img 
+        src="/Splash.png" 
+        alt="Food Locker Splash"
+        className="w-full h-full"
+        style={{ 
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          display: 'block'
+        }}
+      />
     </div>
   );
 };
