@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Heart, ShoppingCart, Receipt, User } from 'lucide-react';
+import { Home, Heart, ShoppingCart, Package, User } from 'lucide-react';
 
 const BottomNavigation = () => {
   const location = useLocation();
@@ -9,13 +9,16 @@ const BottomNavigation = () => {
     { path: '/home', icon: Home, label: '홈' },
     { path: '/wishlist', icon: Heart, label: '관심목록' },
     { path: '/cart', icon: ShoppingCart, label: '장바구니' },
-    { path: '/order/history', icon: Receipt, label: '결제내역' },
+    { path: '/order/status', icon: Package, label: '주문 현황' },
     { path: '/mypage', icon: User, label: '마이페이지' },
   ];
 
   const isActive = (path) => {
     if (path === '/home') {
-      return currentPath === '/home' || currentPath === '/search' || currentPath === '/order';
+      return currentPath === '/home' || currentPath === '/search';
+    }
+    if (path === '/order/status') {
+      return currentPath === '/order/status' || currentPath.startsWith('/delivery-status');
     }
     return currentPath.startsWith(path);
   };

@@ -15,9 +15,11 @@ import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import OrderPage from './pages/OrderPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
+import OrderStatusPage from './pages/OrderStatusPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import LockerInfoPage from './pages/LockerInfoPage';
+import DeliveryStatusPage from './pages/DeliveryStatusPage';
 import SettingsPage from './pages/SettingsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import MyPage from './pages/MyPage';
@@ -99,6 +101,10 @@ function App() {
             element={user ? <OrderHistoryPage /> : <Navigate to="/signin" />} 
           />
           <Route 
+            path="/order/status" 
+            element={user ? <OrderStatusPage /> : <Navigate to="/signin" />} 
+          />
+          <Route 
             path="/payment" 
             element={user ? <PaymentPage /> : <Navigate to="/signin" />} 
           />
@@ -109,6 +115,10 @@ function App() {
           <Route 
             path="/locker/:orderId" 
             element={user ? <LockerInfoPage /> : <Navigate to="/signin" />} 
+          />
+          <Route 
+            path="/delivery-status/:orderId" 
+            element={user ? <DeliveryStatusPage /> : <Navigate to="/signin" />} 
           />
           <Route 
             path="/settings" 

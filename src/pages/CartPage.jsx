@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart } from 'lucide-react';
 import useCartStore from '../store/cartStore';
 
 const CartPage = () => {
@@ -11,10 +11,20 @@ const CartPage = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-white pb-24 flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🛒</div>
+        <div className="text-center max-w-sm w-full">
+          <div className="mb-6 flex justify-center">
+            <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center">
+              <ShoppingCart size={64} className="text-primary" strokeWidth={1.5} />
+            </div>
+          </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">장바구니가 비어있습니다</h2>
-          <Link to="/home" className="text-primary font-medium">
+          <p className="text-sm text-gray-500 mb-6">
+            맛있는 음식을 장바구니에 담아보세요
+          </p>
+          <Link 
+            to="/home" 
+            className="inline-block px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+          >
             메뉴 둘러보기
           </Link>
         </div>
@@ -31,8 +41,24 @@ const CartPage = () => {
       <div className="px-4 py-4 space-y-4">
         {items.map((item, index) => (
           <div key={index} className="flex items-center bg-gray-50 rounded-lg p-4">
-            <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-3xl mr-4">
-              {item.image || '🍔'}
+            <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden mr-4 flex-shrink-0">
+              {item.image ? (
+                <img 
+                  src={item.image} 
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    const placeholder = e.target.parentElement.querySelector('.image-placeholder');
+                    if (placeholder) {
+                      placeholder.classList.remove('hidden');
+                    }
+                  }}
+                />
+              ) : null}
+              <div className={`${item.image ? 'hidden' : ''} image-placeholder w-full h-full flex items-center justify-center`}>
+                <span className="text-3xl">🍔</span>
+              </div>
             </div>
             
             <div className="flex-1">
