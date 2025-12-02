@@ -66,65 +66,82 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-20">
       {/* Header with Settings and Bell icons */}
-      <div className="sticky top-0 bg-white z-10 px-4 pt-5 pb-10 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-10">
-          <Link to="/settings">
-            <Settings size={24} className="text-gray-700" />
+      <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-4 pt-5 pb-6 border-b border-gray-100 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <Link to="/settings" className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <Settings size={22} className="text-gray-700" />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Food Locker!</h1>
-          <Link to="/notifications">
-            <Bell size={24} className="text-gray-700" />
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+            Food Locker!
+          </h1>
+          <Link to="/notifications" className="p-2 rounded-xl hover:bg-gray-100 transition-colors relative">
+            <Bell size={22} className="text-gray-700" />
+            {getItemCount() > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            )}
           </Link>
         </div>
         
         {/* Search Bar */}
         <Link to="/search">
-          <div className="flex items-center bg-gray-100 rounded-lg px-4 py-3">
-            <Search size={20} className="text-gray-400 mr-2" />
-            <span className="text-gray-500">야구장 검색!</span>
+          <div className="flex items-center bg-white rounded-2xl px-4 py-3.5 border-2 border-gray-100 hover:border-primary/30 hover:shadow-md transition-all duration-200 shadow-soft">
+            <Search size={20} className="text-gray-400 mr-3" />
+            <span className="text-gray-500 font-medium">야구장 검색!</span>
           </div>
         </Link>
       </div>
 
       {/* Categories Section */}
-      <div className="px-4 pt-10 pb-6">
-        <h2 className="text-lg font-semibold mb-3 text-gray-900">Categories</h2>
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+      <div className="px-4 pt-6 pb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">Categories</h2>
+          <span className="text-xs text-gray-400">{categories.length}개</span>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
           {categories.map((category) => {
             const isActive = category.id === selectedCategory;
             return (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex-shrink-0 flex flex-col items-center rounded-lg p-4 min-w-[100px] relative ${
+                className={`flex-shrink-0 flex flex-col items-center rounded-2xl p-5 min-w-[110px] relative transition-all duration-300 ${
                   isActive 
-                    ? 'bg-primary' 
-                    : 'bg-white border border-gray-200'
+                    ? 'bg-gradient-to-br from-primary to-primary/90 shadow-lg scale-105 transform' 
+                    : 'bg-white border-2 border-gray-100 hover:border-primary/30 hover:shadow-md hover:scale-[1.02]'
                 }`}
               >
-                {/* Category Image */}
-                <div className="w-16 h-16 mb-2 relative overflow-hidden rounded-lg">
+                {/* Category Image with gradient overlay */}
+                <div className={`w-20 h-20 mb-3 relative overflow-hidden rounded-2xl ${
+                  isActive ? 'ring-2 ring-white/30' : ''
+                }`}>
+                  <div className={`absolute inset-0 ${
+                    isActive ? 'bg-gradient-to-br from-white/20 to-transparent' : ''
+                  }`}></div>
                   <img 
                     src={category.image} 
                     alt={category.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover transition-transform duration-300 ${
+                      isActive ? 'scale-110' : 'hover:scale-105'
+                    }`}
                     onError={(e) => {
                       e.target.style.display = 'none';
                     }}
                   />
                 </div>
-                <span className={`text-sm font-medium mb-1 ${
-                  isActive ? 'text-white' : 'text-gray-700'
+                <span className={`text-sm font-bold mb-2 transition-colors ${
+                  isActive ? 'text-white' : 'text-gray-800'
                 }`}>
                   {category.name}
                 </span>
                 {/* Arrow icon at bottom center */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+                <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 transition-all duration-300 ${
+                  isActive ? 'scale-110' : ''
+                }`}>
                   <ChevronRight 
-                    size={16} 
-                    className={isActive ? 'text-yellow-400' : 'text-gray-400'} 
+                    size={18} 
+                    className={isActive ? 'text-white drop-shadow-sm' : 'text-gray-400'} 
                   />
                 </div>
               </button>
@@ -134,26 +151,32 @@ const HomePage = () => {
       </div>
 
       {/* Recommended Section */}
-      <div className="px-4 pt-5 pb-6">
-        <h2 className="text-lg font-semibold mb-3 text-gray-900">
-          {categories.find(cat => cat.id === selectedCategory)?.nameKo || '메뉴'}
-        </h2>
+      <div className="px-4 pt-2 pb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">
+            {categories.find(cat => cat.id === selectedCategory)?.nameKo || '메뉴'}
+          </h2>
+          <span className="text-xs text-primary font-semibold bg-primary/10 px-2 py-1 rounded-full">
+            {recommendedItems.length}개
+          </span>
+        </div>
         {recommendedItems.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3">
-            {recommendedItems.map((item) => (
+          <div className="grid grid-cols-2 gap-4">
+            {recommendedItems.map((item, index) => (
             <Link
               key={item.id}
               to={`/item/${item.id}`}
-              className="bg-white rounded-lg overflow-hidden border border-gray-200 relative shadow-sm"
+              className="bg-white rounded-2xl overflow-hidden border-2 border-gray-50 relative shadow-soft hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 group"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
-              {/* Food Image */}
-              <div className="w-full h-48 bg-gray-100 relative">
+              {/* Food Image with gradient overlay */}
+              <div className="w-full h-52 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent z-10"></div>
                 <img 
                   src={item.image} 
                   alt={item.name}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                   onError={(e) => {
-                    // 이미지 로드 실패 시 플레이스홀더 표시
                     const placeholder = e.target.parentElement.querySelector('.image-placeholder');
                     if (placeholder) {
                       e.target.style.display = 'none';
@@ -164,27 +187,31 @@ const HomePage = () => {
                 <div className="hidden image-placeholder w-full h-full items-center justify-center text-6xl bg-gray-100">
                   {item.id === 1 ? '🥪' : '🍔'}
                 </div>
+                {/* Badge */}
+                <div className="absolute top-2 left-2 bg-primary/90 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md z-20">
+                  인기
+                </div>
               </div>
               
               {/* Content */}
-              <div className="p-3 pb-10">
-                <h3 className="font-semibold text-gray-900 mb-1 text-sm">{item.name}</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xs text-gray-500">{item.description}</span>
-                  <span className="text-primary font-semibold text-sm">${item.price}</span>
+              <div className="p-4 pb-16">
+                <h3 className="font-bold text-gray-900 mb-2 text-base">{item.name}</h3>
+                <div className="flex items-baseline gap-2 pr-14">
+                  <span className="text-xs text-gray-500 font-medium">{item.description}</span>
+                  <span className="text-primary font-bold text-lg">${item.price}</span>
                 </div>
               </div>
 
               {/* Plus Button */}
               <button
                 onClick={(e) => handleAddToCart(e, item)}
-                className={`absolute bottom-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center shadow-md z-10 ${
+                className={`absolute bottom-4 right-4 w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg z-10 transition-all duration-300 hover:scale-110 active:scale-95 ${
                   item.id === 1 
-                    ? 'bg-gray-600' 
-                    : 'bg-yellow-400'
+                    ? 'bg-gradient-to-br from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900' 
+                    : 'bg-gradient-to-br from-primary to-primary/90 hover:from-primary/90 hover:to-primary'
                 }`}
               >
-                <Plus size={18} className="text-white" />
+                <Plus size={20} className="text-white drop-shadow-sm" />
               </button>
             </Link>
           ))}
@@ -199,14 +226,12 @@ const HomePage = () => {
       {getItemCount() > 0 && (
         <Link
           to="/cart"
-          className="fixed bottom-20 right-4 bg-primary text-white rounded-full p-4 shadow-lg z-40"
+          className="fixed bottom-20 right-4 bg-gradient-to-r from-primary to-primary/90 text-white rounded-2xl px-5 py-4 shadow-lg z-40 hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2"
         >
-          <div className="flex items-center">
-            <span className="mr-2">장바구니</span>
-            <span className="bg-white text-primary rounded-full px-2 py-1 text-sm font-bold">
-              {getItemCount()}
-            </span>
-          </div>
+          <span className="font-bold">장바구니</span>
+          <span className="bg-white text-primary rounded-full px-3 py-1 text-sm font-bold shadow-md">
+            {getItemCount()}
+          </span>
         </Link>
       )}
     </div>

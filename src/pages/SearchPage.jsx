@@ -340,10 +340,10 @@ const SearchPage = () => {
                     <button
                       key={item.id}
                       onClick={() => setSelectedItem(item)}
-                      className={`w-full bg-white rounded-lg overflow-hidden border-2 shadow-sm transition-all ${
+                      className={`w-full bg-white rounded-xl overflow-hidden border-2 shadow-soft transition-all duration-200 ${
                         isSelected 
-                          ? 'border-primary ring-2 ring-primary ring-offset-2' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-primary ring-2 ring-primary ring-offset-2 shadow-medium scale-[1.02]' 
+                          : 'border-gray-100 hover:border-gray-200 hover:shadow-medium'
                       }`}
                     >
                       <div className="w-full h-32 bg-gray-100 relative overflow-hidden">

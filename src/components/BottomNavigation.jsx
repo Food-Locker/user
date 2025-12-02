@@ -24,7 +24,7 @@ const BottomNavigation = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom z-50 mobile-container">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 safe-area-bottom z-50 mobile-container shadow-[0_-2px_8px_rgba(0,0,0,0.04)]">
       <div className="flex justify-around items-center h-16 px-2">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -34,12 +34,12 @@ const BottomNavigation = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center justify-center flex-1 h-full ${
-                active ? 'text-primary' : 'text-gray-500'
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-200 ${
+                active ? 'text-primary' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              <Icon size={24} className={active ? 'text-primary' : 'text-gray-500'} />
-              <span className={`text-xs mt-1 ${active ? 'text-primary font-semibold' : 'text-gray-500'}`}>
+              <Icon size={24} className={`transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`} />
+              <span className={`text-xs mt-1 transition-all duration-200 ${active ? 'text-primary font-semibold' : 'text-gray-500'}`}>
                 {item.label}
               </span>
             </Link>

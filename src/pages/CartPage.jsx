@@ -40,8 +40,8 @@ const CartPage = () => {
 
       <div className="px-4 py-4 space-y-4">
         {items.map((item, index) => (
-          <div key={index} className="flex items-center bg-gray-50 rounded-lg p-4">
-            <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden mr-4 flex-shrink-0">
+          <div key={index} className="flex items-center bg-white rounded-xl p-4 border border-gray-100 shadow-soft hover:shadow-medium transition-all duration-200">
+            <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden mr-4 flex-shrink-0 border border-gray-100">
               {item.image ? (
                 <img 
                   src={item.image} 
@@ -64,26 +64,26 @@ const CartPage = () => {
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900">{item.name}</h3>
               <p className="text-sm text-gray-600">{item.description || 'Spicy with black pepper sauce'}</p>
-              <p className="text-primary font-semibold mt-1">${item.price}</p>
+              <p className="text-primary font-bold text-lg mt-1">{item.price?.toLocaleString() || 0}원</p>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => updateQuantity(item.id, item.quantity - 1, item.options)}
-                className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded"
+                className="w-9 h-9 flex items-center justify-center border border-gray-200 rounded-xl hover:bg-gray-50 active:scale-95 transition-all duration-200"
               >
-                <Minus size={16} />
+                <Minus size={16} className="text-gray-600" />
               </button>
-              <span className="w-8 text-center font-medium">{item.quantity}</span>
+              <span className="w-10 text-center font-semibold text-gray-900">{item.quantity}</span>
               <button
                 onClick={() => updateQuantity(item.id, item.quantity + 1, item.options)}
-                className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded"
+                className="w-9 h-9 flex items-center justify-center border border-gray-200 rounded-xl hover:bg-gray-50 active:scale-95 transition-all duration-200"
               >
-                <Plus size={16} />
+                <Plus size={16} className="text-gray-600" />
               </button>
               <button
                 onClick={() => removeItem(item.id, item.options)}
-                className="ml-2 text-red-500"
+                className="ml-2 w-9 h-9 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-xl active:scale-95 transition-all duration-200"
               >
                 <Trash2 size={18} />
               </button>
@@ -92,29 +92,29 @@ const CartPage = () => {
         ))}
       </div>
 
-      <div className="px-4 py-4 border-t border-gray-200 space-y-3">
+      <div className="px-4 py-4 bg-gray-50 rounded-xl mx-4 mb-4 space-y-3">
         <div className="flex justify-between text-gray-700">
-          <span>Items</span>
-          <span>${total.toFixed(2)}</span>
+          <span className="text-gray-600">메뉴 금액</span>
+          <span className="font-medium">{total.toLocaleString()}원</span>
         </div>
         <div className="flex justify-between text-gray-700">
-          <span>Sales Tax</span>
-          <span>${tax.toFixed(2)}</span>
+          <span className="text-gray-600">배달팁</span>
+          <span className="font-medium">{tax.toLocaleString()}원</span>
         </div>
         <div className="flex justify-between text-gray-700">
-          <span>Promo Code</span>
-          <span className="text-primary">-$0.00</span>
+          <span className="text-gray-600">할인</span>
+          <span className="text-primary font-medium">-0원</span>
         </div>
-        <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
-          <span>Subtotal ({items.length} items)</span>
-          <span>${subtotal.toFixed(2)}</span>
+        <div className="flex justify-between font-bold text-lg pt-3 border-t border-gray-200">
+          <span>총 결제금액 ({items.length}개)</span>
+          <span className="text-primary">{subtotal.toLocaleString()}원</span>
         </div>
       </div>
 
       <div className="px-4 pb-4">
         <Link
           to="/payment"
-          className="block w-full py-4 bg-primary text-white text-center rounded-lg font-semibold"
+          className="block w-full py-4 bg-primary text-white text-center rounded-xl font-semibold shadow-medium hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
         >
           결제하기
         </Link>

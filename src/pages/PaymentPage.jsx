@@ -84,7 +84,7 @@ const PaymentPage = () => {
           <h2 className="text-lg font-semibold mb-4 text-gray-900">
             수령방법
           </h2>
-          <div className="bg-gray-50 border-2 border-primary rounded-lg p-4">
+          <div className="bg-primary/5 border-2 border-primary rounded-xl p-4 shadow-soft">
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-semibold text-gray-900">락커 배달</h3>
@@ -102,10 +102,10 @@ const PaymentPage = () => {
           <div className="space-y-3">
             <button
               onClick={() => setPaymentMethod('card')}
-              className={`w-full p-4 border-2 rounded-lg text-left ${
+              className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'card'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200'
+                  ? 'border-primary bg-primary/5 shadow-soft'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center">
@@ -120,10 +120,10 @@ const PaymentPage = () => {
 
             <button
               onClick={() => setPaymentMethod('kakao')}
-              className={`w-full p-4 border-2 rounded-lg text-left ${
+              className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'kakao'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200'
+                  ? 'border-primary bg-primary/5 shadow-soft'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center">
@@ -138,10 +138,10 @@ const PaymentPage = () => {
 
             <button
               onClick={() => setPaymentMethod('naver')}
-              className={`w-full p-4 border-2 rounded-lg text-left ${
+              className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'naver'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200'
+                  ? 'border-primary bg-primary/5 shadow-soft'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center">
@@ -156,10 +156,10 @@ const PaymentPage = () => {
 
             <button
               onClick={() => setPaymentMethod('toss')}
-              className={`w-full p-4 border-2 rounded-lg text-left ${
+              className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'toss'
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-200'
+                  ? 'border-primary bg-primary/5 shadow-soft'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center">
@@ -178,7 +178,7 @@ const PaymentPage = () => {
           <h2 className="text-lg font-semibold mb-4 text-gray-900">
             결제금액을 확인해주세요
           </h2>
-          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+          <div className="bg-gray-50 rounded-xl p-4 space-y-3 shadow-soft">
             <div className="flex justify-between text-gray-700">
               <span>메뉴 금액</span>
               <span>{menuTotal.toLocaleString()}원</span>
@@ -217,7 +217,7 @@ const PaymentPage = () => {
         <button
           onClick={handlePayment}
           disabled={loading || !paymentMethod}
-          className="w-full py-4 bg-primary text-white text-center rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-4 bg-primary text-white text-center rounded-xl font-semibold shadow-medium hover:shadow-lg transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? '결제 처리 중...' : '결제하기'}
         </button>

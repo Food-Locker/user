@@ -106,7 +106,7 @@ const OrderStatusPage = () => {
               <button
                 key={order.id}
                 onClick={() => navigate(`/delivery-status/${order.id}`)}
-                className="w-full bg-white border-2 border-gray-200 rounded-lg p-4 text-left hover:border-primary transition-colors"
+                className="w-full bg-white border-2 border-gray-100 rounded-xl p-4 text-left hover:border-primary hover:shadow-medium transition-all duration-200 active:scale-[0.98] shadow-soft"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">

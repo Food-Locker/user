@@ -180,12 +180,12 @@ const DeliveryStatusPage = () => {
               return (
                 <div
                   key={statusItem.id}
-                  className={`p-4 border-2 rounded-lg ${
+                  className={`p-4 border-2 rounded-xl transition-all duration-200 ${
                     isCurrent
-                      ? 'border-primary bg-primary/5'
+                      ? 'border-primary bg-primary/5 shadow-soft'
                       : isActive
                       ? 'border-primary/30 bg-primary/5'
-                      : 'border-gray-200 bg-white'
+                      : 'border-gray-100 bg-white'
                   }`}
                 >
                   <div className="flex items-center justify-between">
