@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Settings, Bell, Filter, ChevronRight, Plus } from 'lucide-react';
+import { Search, Settings, Bell, ChevronRight, Plus } from 'lucide-react';
 import useCartStore from '../store/cartStore';
 
 const HomePage = () => {
@@ -79,20 +79,13 @@ const HomePage = () => {
           </Link>
         </div>
         
-        {/* Search Bar with Filter Button */}
-        <div className="flex items-center gap-2">
-          <Link to="/search" className="flex-1">
-            <div className="flex items-center bg-gray-100 rounded-lg px-4 py-3">
-              <Search size={20} className="text-gray-400 mr-2" />
-              <span className="text-gray-500">야구장 검색!</span>
-            </div>
-          </Link>
-          <Link to="/search">
-            <button className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-              <Filter size={20} className="text-white" />
-            </button>
-          </Link>
-        </div>
+        {/* Search Bar */}
+        <Link to="/search">
+          <div className="flex items-center bg-gray-100 rounded-lg px-4 py-3">
+            <Search size={20} className="text-gray-400 mr-2" />
+            <span className="text-gray-500">야구장 검색!</span>
+          </div>
+        </Link>
       </div>
 
       {/* Categories Section */}

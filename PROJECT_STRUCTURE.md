@@ -86,9 +86,7 @@ VITE_FIREBASE_APP_ID=your_app_id
 ## 🎨 디자인 시스템
 
 ### 색상 (Tailwind Config)
-- **Primary Green**: `#22C55E` (메인 컬러)
-- **Primary Dark**: `#16A34A`
-- **Primary Light**: `#4ADE80`
+- **Primary Teal**: `#1E6E68` (메인 컬러)
 - **Secondary Gray**: `#F3F4F6`
 
 ### 반응형
