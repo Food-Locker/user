@@ -1,23 +1,69 @@
 import { useState, useEffect } from 'react';
 import { Receipt } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { auth } from '../lib/firebase';
+import { getImagePath } from '../utils/imageUtils';
 
 const OrderHistoryPage = () => {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // localStorage에서 주문 내역 가져오기
-    const orderKeys = Object.keys(localStorage).filter(key => key.startsWith('order_'));
-    const orderList = orderKeys.map(key => {
-      try {
-        return JSON.parse(localStorage.getItem(key));
-      } catch {
-        return null;
+    const fetchOrders = async () => {
+      if (!auth.currentUser) {
+        setLoading(false);
+        return;
       }
-    }).filter(Boolean);
-    
-    setOrders(orderList);
+
+      try {
+        // Firebase에서 완료된 주문 가져오기
+        const ordersRef = collection(db, 'orders');
+        const q = query(
+          ordersRef,
+          where('userId', '==', auth.currentUser.uid),
+          where('status', '==', 'completed'),
+          orderBy('createdAt', 'desc')
+        );
+
+        const snapshot = await getDocs(q);
+        const ordersList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        setOrders(ordersList);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        // 에러 발생 시 localStorage에서 가져오기 (호환성)
+        const orderKeys = Object.keys(localStorage).filter(key => key.startsWith('order_'));
+        const orderList = orderKeys.map(key => {
+          try {
+            return JSON.parse(localStorage.getItem(key));
+          } catch {
+            return null;
+          }
+        }).filter(Boolean);
+        setOrders(orderList);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white pb-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">주문 내역을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -48,22 +94,48 @@ const OrderHistoryPage = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
-              <div key={order.id} className="bg-gray-50 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">매장이름</h3>
-                    <p className="text-sm text-gray-600">메뉴이름</p>
+            {orders.map((order) => {
+              const firstItem = order.items?.[0];
+              const itemName = firstItem?.name || '메뉴';
+              const itemImage = getImagePath(itemName) || '/hamburger.png';
+              return (
+                <div key={order.id} className="bg-white rounded-xl p-4 border border-gray-100 shadow-soft hover:shadow-medium transition-all">
+                  <div className="flex items-start gap-4 mb-2">
+                    {firstItem && (
+                      <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
+                        <img 
+                          src={itemImage} 
+                          alt={itemName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = '/hamburger.png';
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">
+                        {order.items?.length || 0}개 메뉴
+                      </h3>
+                      {firstItem && (
+                        <p className="text-sm text-gray-600">{itemName}</p>
+                      )}
+                      {order.seatBlock && order.seatNumber && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          좌석: {order.seatBlock}블록 {order.seatNumber}번
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-primary font-semibold">
+                      {order.total?.toLocaleString() || 0}원
+                    </span>
                   </div>
-                  <span className="text-primary font-semibold">
-                    ${order.total?.toFixed(2) || '25.99'}
-                  </span>
+                  <p className="text-xs text-gray-500">
+                    {order.createdAt ? new Date(order.createdAt).toLocaleString('ko-KR') : ''}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500">
-                  {new Date(order.createdAt).toLocaleDateString('ko-KR')}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

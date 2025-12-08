@@ -1,54 +1,134 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Settings, Bell, ChevronRight, Plus } from 'lucide-react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import useCartStore from '../store/cartStore';
+import { getImagePath, getCategoryImage } from '../utils/imageUtils';
 
 const HomePage = () => {
   const { getItemCount, addItem } = useCartStore();
-  const [selectedCategory, setSelectedCategory] = useState(1); // 기본값: Sandwich
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [allItems, setAllItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const categories = [
-    { id: 1, name: 'Sandwich', nameKo: '샌드위치', image: '/sandwich.png' },
-    { id: 2, name: 'Pizza', nameKo: '피자', image: '/pizza.png' },
-    { id: 3, name: 'Burger', nameKo: '버거', image: '/hamburger.png' },
-    { id: 4, name: 'Drinks', nameKo: '음료', image: '/drinks.png' },
-  ];
+  // Firebase에서 카테고리 가져오기 (첫 번째 stadium의 categories 사용)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const stadiumsCollection = collection(db, 'stadiums');
+        const stadiumsSnapshot = await getDocs(stadiumsCollection);
+        
+        if (!stadiumsSnapshot.empty) {
+          const firstStadium = stadiumsSnapshot.docs[0];
+          const categoriesCollection = collection(db, 'stadiums', firstStadium.id, 'categories');
+          const categoriesSnapshot = await getDocs(categoriesCollection);
+          
+          const categoriesList = categoriesSnapshot.docs.map((doc, index) => ({
+            id: doc.id,
+            ...doc.data(),
+            nameKo: doc.data().name || doc.data().categoryName || '카테고리',
+            image: getCategoryImage(doc.data().name || doc.data().categoryName || '')
+          }));
+          
+          setCategories(categoriesList);
+          
+          // 첫 번째 카테고리를 기본 선택
+          if (categoriesList.length > 0 && !selectedCategory) {
+            setSelectedCategory(categoriesList[0].id);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // 모든 음식 아이템 (실제로는 서버에서 가져올 데이터)
-  const allItems = [
-    { 
-      id: 1, 
-      name: 'Sandwich', 
-      categoryId: 1,
-      price: 15.50, 
-      image: '/sandwich.png',
-      description: 'Starting From'
-    },
-    { 
-      id: 2, 
-      name: 'Hamburger', 
-      categoryId: 3,
-      price: 19.99, 
-      image: '/hamburger.png',
-      description: 'Starting From'
-    },
-    { 
-      id: 3, 
-      name: 'Cheese Pizza', 
-      categoryId: 2,
-      price: 22.00, 
-      image: '/pizza.png',
-      description: 'Starting From'
-    },
-    { 
-      id: 4, 
-      name: 'Cola', 
-      categoryId: 4,
-      price: 3.50, 
-      image: '/drinks.png',
-      description: 'Starting From'
-    },
-  ];
+    fetchCategories();
+  }, []);
+
+  // 선택된 카테고리의 모든 아이템 가져오기
+  useEffect(() => {
+    const fetchItems = async () => {
+      if (!selectedCategory) {
+        setAllItems([]);
+        return;
+      }
+
+      try {
+        const stadiumsCollection = collection(db, 'stadiums');
+        const stadiumsSnapshot = await getDocs(stadiumsCollection);
+        
+        if (stadiumsSnapshot.empty) {
+          setAllItems([]);
+          return;
+        }
+
+        const allItemsList = [];
+        
+        // 모든 stadium의 해당 카테고리 아이템 가져오기
+        for (const stadiumDoc of stadiumsSnapshot.docs) {
+          try {
+            const categoriesCollection = collection(db, 'stadiums', stadiumDoc.id, 'categories');
+            const categoriesSnapshot = await getDocs(categoriesCollection);
+            
+            const categoryDoc = categoriesSnapshot.docs.find(doc => doc.id === selectedCategory);
+            if (!categoryDoc) continue;
+
+            const brandsCollection = collection(
+              db, 
+              'stadiums', 
+              stadiumDoc.id, 
+              'categories', 
+              categoryDoc.id, 
+              'brands'
+            );
+            const brandsSnapshot = await getDocs(brandsCollection);
+
+            for (const brandDoc of brandsSnapshot.docs) {
+              const itemsCollection = collection(
+                db,
+                'stadiums',
+                stadiumDoc.id,
+                'categories',
+                categoryDoc.id,
+                'brands',
+                brandDoc.id,
+                'items'
+              );
+              const itemsSnapshot = await getDocs(itemsCollection);
+              
+              const items = itemsSnapshot.docs.map(doc => {
+                const data = doc.data();
+                const itemName = data.name || data.itemName || data.title || 'Item';
+                return {
+                  id: doc.id,
+                  ...data,
+                  name: itemName,
+                  price: data.price || data.itemPrice || 0,
+                  image: getImagePath(itemName) || '/hamburger.png',
+                  description: data.description || 'Starting From',
+                  categoryId: selectedCategory
+                };
+              });
+              
+              allItemsList.push(...items);
+            }
+          } catch (error) {
+            console.error(`Error fetching items for stadium ${stadiumDoc.id}:`, error);
+          }
+        }
+
+        setAllItems(allItemsList);
+      } catch (error) {
+        console.error('Error fetching items:', error);
+      }
+    };
+
+    fetchItems();
+  }, [selectedCategory]);
 
   // 선택된 카테고리에 맞는 아이템 필터링
   const recommendedItems = allItems.filter(item => item.categoryId === selectedCategory);
@@ -100,53 +180,61 @@ const HomePage = () => {
           <span className="text-xs text-gray-400">{categories.length}개</span>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
-          {categories.map((category) => {
-            const isActive = category.id === selectedCategory;
-            return (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex-shrink-0 flex flex-col items-center rounded-2xl p-5 min-w-[110px] relative transition-all duration-300 ${
-                  isActive 
-                    ? 'bg-gradient-to-br from-primary to-primary/90 shadow-lg scale-105 transform' 
-                    : 'bg-white border-2 border-gray-100 hover:border-primary/30 hover:shadow-md hover:scale-[1.02]'
-                }`}
-              >
-                {/* Category Image with gradient overlay */}
-                <div className={`w-20 h-20 mb-3 relative overflow-hidden rounded-2xl ${
-                  isActive ? 'ring-2 ring-white/30' : ''
-                }`}>
-                  <div className={`absolute inset-0 ${
-                    isActive ? 'bg-gradient-to-br from-white/20 to-transparent' : ''
-                  }`}></div>
-                  <img 
-                    src={category.image} 
-                    alt={category.name}
-                    className={`w-full h-full object-cover transition-transform duration-300 ${
-                      isActive ? 'scale-110' : 'hover:scale-105'
-                    }`}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
-                <span className={`text-sm font-bold mb-2 transition-colors ${
-                  isActive ? 'text-white' : 'text-gray-800'
-                }`}>
-                  {category.name}
-                </span>
-                {/* Arrow icon at bottom center */}
-                <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 transition-all duration-300 ${
-                  isActive ? 'scale-110' : ''
-                }`}>
-                  <ChevronRight 
-                    size={18} 
-                    className={isActive ? 'text-white drop-shadow-sm' : 'text-gray-400'} 
-                  />
-                </div>
-              </button>
-            );
-          })}
+          {loading ? (
+            <div className="flex gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex-shrink-0 w-[110px] h-[110px] bg-gray-200 rounded-2xl animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            categories.map((category) => {
+              const isActive = category.id === selectedCategory;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`flex-shrink-0 flex flex-col items-center rounded-2xl p-5 min-w-[110px] relative transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-gradient-to-br from-primary to-primary/90 shadow-lg scale-105 transform' 
+                      : 'bg-white border-2 border-gray-100 hover:border-primary/30 hover:shadow-md hover:scale-[1.02]'
+                  }`}
+                >
+                  {/* Category Image with gradient overlay */}
+                  <div className={`w-20 h-20 mb-3 relative overflow-hidden rounded-2xl ${
+                    isActive ? 'ring-2 ring-white/30' : ''
+                  }`}>
+                    <div className={`absolute inset-0 ${
+                      isActive ? 'bg-gradient-to-br from-white/20 to-transparent' : ''
+                    }`}></div>
+                    <img 
+                      src={category.image} 
+                      alt={category.name || category.nameKo}
+                      className={`w-full h-full object-cover transition-transform duration-300 ${
+                        isActive ? 'scale-110' : 'hover:scale-105'
+                      }`}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                  <span className={`text-sm font-bold mb-2 transition-colors ${
+                    isActive ? 'text-white' : 'text-gray-800'
+                  }`}>
+                    {category.nameKo || category.name}
+                  </span>
+                  {/* Arrow icon at bottom center */}
+                  <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 transition-all duration-300 ${
+                    isActive ? 'scale-110' : ''
+                  }`}>
+                    <ChevronRight 
+                      size={18} 
+                      className={isActive ? 'text-white drop-shadow-sm' : 'text-gray-400'} 
+                    />
+                  </div>
+                </button>
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -154,7 +242,7 @@ const HomePage = () => {
       <div className="px-4 pt-2 pb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">
-            {categories.find(cat => cat.id === selectedCategory)?.nameKo || '메뉴'}
+            {categories.find(cat => cat.id === selectedCategory)?.nameKo || categories.find(cat => cat.id === selectedCategory)?.name || '메뉴'}
           </h2>
           <span className="text-xs text-primary font-semibold bg-primary/10 px-2 py-1 rounded-full">
             {recommendedItems.length}개
@@ -184,8 +272,8 @@ const HomePage = () => {
                     }
                   }}
                 />
-                <div className="hidden image-placeholder w-full h-full items-center justify-center text-6xl bg-gray-100">
-                  {item.id === 1 ? '🥪' : '🍔'}
+                <div className="hidden image-placeholder w-full h-full items-center justify-center bg-gray-100">
+                  <img src="/hamburger.png" alt="placeholder" className="w-16 h-16 opacity-50" />
                 </div>
                 {/* Badge */}
                 <div className="absolute top-2 left-2 bg-primary/90 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md z-20">

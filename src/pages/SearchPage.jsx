@@ -4,6 +4,7 @@ import { ArrowLeft, ShoppingCart, CheckCircle2 } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import useCartStore from '../store/cartStore';
+import { getImagePath } from '../utils/imageUtils';
 
 const SearchPage = () => {
   const navigate = useNavigate();
@@ -151,34 +152,6 @@ const SearchPage = () => {
 
   const handleBrandSelect = (brand) => {
     setSelectedBrand(brand);
-  };
-
-  // public 폴더에서 이미지 찾기: item 이름을 기반으로 파일명 생성
-  const getImagePath = (name) => {
-    if (!name) return null;
-    
-    // 한글 이름을 영문 파일명으로 매핑
-    const imageMap = {
-      '황금올리브핫윙': '/Golden-Olive-Hot.png',
-      '황금올리브치킨': '/Golden-Olive.png',
-      '황금올리브닭다리': '/Chicken-Leg.png',
-    };
-    
-    // 정확한 매칭 시도
-    if (imageMap[name]) {
-      return imageMap[name];
-    }
-    
-    // 부분 매칭 시도
-    for (const [key, value] of Object.entries(imageMap)) {
-      if (name.includes(key) || key.includes(name)) {
-        return value;
-      }
-    }
-    
-    // 기본 이미지 시도 (이름 기반)
-    const sanitizedName = name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
-    return `/${sanitizedName}.png`;
   };
 
   return (
@@ -363,7 +336,7 @@ const SearchPage = () => {
                           />
                         ) : null}
                         <div className={`${itemImage ? 'hidden' : ''} image-placeholder w-full h-full flex items-center justify-center`}>
-                          <span className="text-4xl">🍔</span>
+                          <img src="/hamburger.png" alt="placeholder" className="w-12 h-12 opacity-50" />
                         </div>
                       </div>
                       <div className="p-3">

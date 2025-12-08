@@ -57,7 +57,7 @@ const CartPage = () => {
                 />
               ) : null}
               <div className={`${item.image ? 'hidden' : ''} image-placeholder w-full h-full flex items-center justify-center`}>
-                <span className="text-3xl">🍔</span>
+                <img src="/hamburger.png" alt="placeholder" className="w-12 h-12 opacity-50" />
               </div>
             </div>
             
