@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Clock, UtensilsCrossed, CheckCircle2, Package } from 'lucide-react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { api, pollOrderStatus } from '../lib/mongodb';
 
 const DeliveryStatusPage = () => {
   const navigate = useNavigate();
@@ -35,23 +34,22 @@ const DeliveryStatusPage = () => {
     }
   ];
 
-  // Firebase에서 주문 상태 실시간 감지
+  // MongoDB에서 주문 상태 실시간 감지 (폴링)
   useEffect(() => {
     if (!orderId) {
       setLoading(false);
       return;
     }
 
-    const orderRef = doc(db, 'orders', orderId);
-    
-    const unsubscribe = onSnapshot(orderRef, (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        setOrder({
-          id: docSnapshot.id,
-          ...docSnapshot.data()
-        });
-      } else {
-        // 주문이 없으면 localStorage에서 가져오기 (기존 주문 호환성)
+    // 초기 로드
+    const fetchOrder = async () => {
+      try {
+        const orderData = await api.getOrder(orderId);
+        setOrder(orderData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching order:', error);
+        // 에러 발생 시 localStorage에서 가져오기
         const localOrder = localStorage.getItem(`order_${orderId}`);
         if (localOrder) {
           try {
@@ -61,24 +59,18 @@ const DeliveryStatusPage = () => {
             console.error('Error parsing local order:', e);
           }
         }
+        setLoading(false);
       }
-      setLoading(false);
-    }, (error) => {
-      console.error('Error fetching order:', error);
-      // 에러 발생 시 localStorage에서 가져오기
-      const localOrder = localStorage.getItem(`order_${orderId}`);
-      if (localOrder) {
-        try {
-          const orderData = JSON.parse(localOrder);
-          setOrder(orderData);
-        } catch (e) {
-          console.error('Error parsing local order:', e);
-        }
-      }
-      setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    fetchOrder();
+
+    // 실시간 업데이트를 위한 폴링
+    const stopPolling = pollOrderStatus(orderId, (orderData) => {
+      setOrder(orderData);
+    }, 2000);
+
+    return () => stopPolling();
   }, [orderId]);
 
   // 현재 주문 상태에 따라 상태 카드 업데이트

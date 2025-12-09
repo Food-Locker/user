@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { api } from '../lib/mongodb';
 import { auth } from '../lib/firebase';
 import useCartStore from '../store/cartStore';
 import useSeatStore from '../store/seatStore';
@@ -37,7 +36,7 @@ const PaymentPage = () => {
     setLoading(true);
 
     try {
-      // Firebase에 주문 정보 저장
+      // MongoDB에 주문 정보 저장
       const orderData = {
         userId: auth.currentUser?.uid || 'anonymous',
         items,
@@ -47,19 +46,14 @@ const PaymentPage = () => {
         paymentMethod,
         total: finalTotal,
         status: 'received', // 초기 상태: 접수됨
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       };
 
-      // Firestore에 주문 추가
-      const docRef = await addDoc(collection(db, 'orders'), orderData);
-      const orderId = docRef.id;
+      // MongoDB API에 주문 추가
+      const order = await api.createOrder(orderData);
+      const orderId = order.id;
 
       // localStorage에도 백업 저장 (호환성)
-      localStorage.setItem(`order_${orderId}`, JSON.stringify({
-        id: orderId,
-        ...orderData
-      }));
+      localStorage.setItem(`order_${orderId}`, JSON.stringify(order));
 
       clearCart();
       setLoading(false);

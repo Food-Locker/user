@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Settings, Bell, ChevronRight, Plus } from 'lucide-react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { api } from '../lib/mongodb';
 import useCartStore from '../store/cartStore';
 import { getImagePath, getCategoryImage } from '../utils/imageUtils';
 
@@ -13,30 +12,27 @@ const HomePage = () => {
   const [allItems, setAllItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Firebase에서 카테고리 가져오기 (첫 번째 stadium의 categories 사용)
+  // MongoDB에서 카테고리 가져오기 (첫 번째 stadium의 categories 사용)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const stadiumsCollection = collection(db, 'stadiums');
-        const stadiumsSnapshot = await getDocs(stadiumsCollection);
+        const stadiums = await api.getStadiums();
         
-        if (!stadiumsSnapshot.empty) {
-          const firstStadium = stadiumsSnapshot.docs[0];
-          const categoriesCollection = collection(db, 'stadiums', firstStadium.id, 'categories');
-          const categoriesSnapshot = await getDocs(categoriesCollection);
+        if (stadiums.length > 0) {
+          const firstStadium = stadiums[0];
+          const categoriesList = await api.getCategories(firstStadium.id);
           
-          const categoriesList = categoriesSnapshot.docs.map((doc, index) => ({
-            id: doc.id,
-            ...doc.data(),
-            nameKo: doc.data().name || doc.data().categoryName || '카테고리',
-            image: getCategoryImage(doc.data().name || doc.data().categoryName || '')
+          const categoriesWithImages = categoriesList.map((cat) => ({
+            ...cat,
+            nameKo: cat.nameKo || cat.name || '카테고리',
+            image: getCategoryImage(cat.name || cat.nameKo || '')
           }));
           
-          setCategories(categoriesList);
+          setCategories(categoriesWithImages);
           
           // 첫 번째 카테고리를 기본 선택
-          if (categoriesList.length > 0 && !selectedCategory) {
-            setSelectedCategory(categoriesList[0].id);
+          if (categoriesWithImages.length > 0 && !selectedCategory) {
+            setSelectedCategory(categoriesWithImages[0].id);
           }
         }
       } catch (error) {
@@ -58,70 +54,21 @@ const HomePage = () => {
       }
 
       try {
-        const stadiumsCollection = collection(db, 'stadiums');
-        const stadiumsSnapshot = await getDocs(stadiumsCollection);
+        const itemsList = await api.getAllItems(selectedCategory);
         
-        if (stadiumsSnapshot.empty) {
-          setAllItems([]);
-          return;
-        }
-
-        const allItemsList = [];
+        const itemsWithDetails = itemsList.map(item => {
+          const itemName = item.name || item.itemName || item.title || 'Item';
+          return {
+            ...item,
+            name: itemName,
+            price: item.price || item.itemPrice || 0,
+            image: getImagePath(itemName) || '/hamburger.png',
+            description: item.description || 'Starting From',
+            categoryId: selectedCategory
+          };
+        });
         
-        // 모든 stadium의 해당 카테고리 아이템 가져오기
-        for (const stadiumDoc of stadiumsSnapshot.docs) {
-          try {
-            const categoriesCollection = collection(db, 'stadiums', stadiumDoc.id, 'categories');
-            const categoriesSnapshot = await getDocs(categoriesCollection);
-            
-            const categoryDoc = categoriesSnapshot.docs.find(doc => doc.id === selectedCategory);
-            if (!categoryDoc) continue;
-
-            const brandsCollection = collection(
-              db, 
-              'stadiums', 
-              stadiumDoc.id, 
-              'categories', 
-              categoryDoc.id, 
-              'brands'
-            );
-            const brandsSnapshot = await getDocs(brandsCollection);
-
-            for (const brandDoc of brandsSnapshot.docs) {
-              const itemsCollection = collection(
-                db,
-                'stadiums',
-                stadiumDoc.id,
-                'categories',
-                categoryDoc.id,
-                'brands',
-                brandDoc.id,
-                'items'
-              );
-              const itemsSnapshot = await getDocs(itemsCollection);
-              
-              const items = itemsSnapshot.docs.map(doc => {
-                const data = doc.data();
-                const itemName = data.name || data.itemName || data.title || 'Item';
-                return {
-                  id: doc.id,
-                  ...data,
-                  name: itemName,
-                  price: data.price || data.itemPrice || 0,
-                  image: getImagePath(itemName) || '/hamburger.png',
-                  description: data.description || 'Starting From',
-                  categoryId: selectedCategory
-                };
-              });
-              
-              allItemsList.push(...items);
-            }
-          } catch (error) {
-            console.error(`Error fetching items for stadium ${stadiumDoc.id}:`, error);
-          }
-        }
-
-        setAllItems(allItemsList);
+        setAllItems(itemsWithDetails);
       } catch (error) {
         console.error('Error fetching items:', error);
       }

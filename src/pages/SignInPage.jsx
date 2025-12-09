@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { api } from '../lib/mongodb';
 
 const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
   const handleEmailSignIn = async (e) => {
@@ -18,10 +20,10 @@ const SignInPage = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/home');
+      // 로그인 성공 팝업 표시
+      setShowSuccessModal(true);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -32,11 +34,32 @@ const SignInPage = () => {
 
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      navigate('/home');
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // MongoDB에 사용자 정보가 없으면 생성 (첫 로그인인 경우)
+      try {
+        const existingUser = await api.getUser(user.uid);
+        // 사용자가 이미 존재하면 아무것도 하지 않음
+      } catch (error) {
+        // 사용자가 없으면 생성
+        try {
+          await api.createUser({
+            userId: user.uid,
+            name: user.displayName || '사용자',
+            email: user.email || '',
+            newsletter: false,
+            authProvider: 'google'
+          });
+        } catch (dbError) {
+          console.error('MongoDB 사용자 저장 오류:', dbError);
+        }
+      }
+
+      // 로그인 성공 팝업 표시
+      setShowSuccessModal(true);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -128,6 +151,48 @@ const SignInPage = () => {
           </Link>
         </div>
       </div>
+
+      {/* 로그인 성공 팝업 */}
+      {showSuccessModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => {
+            setShowSuccessModal(false);
+            navigate('/home');
+          }}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col items-center text-center">
+              {/* 성공 아이콘 */}
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle2 size={40} className="text-primary" />
+              </div>
+              
+              {/* 메시지 */}
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                로그인 성공!
+              </h3>
+              <p className="text-sm text-gray-600 mb-6">
+                로그인이 성공적으로 완료되었습니다.
+              </p>
+              
+              {/* 확인 버튼 */}
+              <button
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  navigate('/home');
+                }}
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

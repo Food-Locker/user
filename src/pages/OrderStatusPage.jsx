@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, Clock } from 'lucide-react';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { api, pollOrderStatus } from '../lib/mongodb';
 import { auth } from '../lib/firebase';
 
 const OrderStatusPage = () => {
@@ -16,43 +15,39 @@ const OrderStatusPage = () => {
       return;
     }
 
-    // Firebase에서 진행중인 주문 가져오기 (received, cooking 상태)
-    const ordersRef = collection(db, 'orders');
-    const q = query(
-      ordersRef,
-      where('userId', '==', auth.currentUser.uid),
-      where('status', 'in', ['received', 'cooking']),
-      orderBy('createdAt', 'desc')
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const orders = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setActiveOrders(orders);
-      setLoading(false);
-    }, (error) => {
-      console.error('Error fetching active orders:', error);
-      // 에러 발생 시 localStorage에서 가져오기
-      const orderKeys = Object.keys(localStorage).filter(key => key.startsWith('order_'));
-      const orderList = orderKeys.map(key => {
-        try {
-          const order = JSON.parse(localStorage.getItem(key));
-          // 진행중인 주문만 필터링
-          if (order.status === 'received' || order.status === 'cooking' || order.status === 'pending') {
-            return order;
+    // MongoDB에서 진행중인 주문 가져오기
+    const fetchActiveOrders = async () => {
+      try {
+        const orders = await api.getOrders(auth.currentUser.uid, 'active');
+        setActiveOrders(orders);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching active orders:', error);
+        // 에러 발생 시 localStorage에서 가져오기
+        const orderKeys = Object.keys(localStorage).filter(key => key.startsWith('order_'));
+        const orderList = orderKeys.map(key => {
+          try {
+            const order = JSON.parse(localStorage.getItem(key));
+            // 진행중인 주문만 필터링
+            if (order.status === 'received' || order.status === 'cooking' || order.status === 'pending') {
+              return order;
+            }
+            return null;
+          } catch {
+            return null;
           }
-          return null;
-        } catch {
-          return null;
-        }
-      }).filter(Boolean);
-      setActiveOrders(orderList);
-      setLoading(false);
-    });
+        }).filter(Boolean);
+        setActiveOrders(orderList);
+        setLoading(false);
+      }
+    };
 
-    return () => unsubscribe();
+    fetchActiveOrders();
+
+    // 실시간 업데이트를 위한 주기적 폴링
+    const intervalId = setInterval(fetchActiveOrders, 3000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const getStatusText = (status) => {

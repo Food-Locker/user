@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, CheckCircle2 } from 'lucide-react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { api } from '../lib/mongodb';
 import useCartStore from '../store/cartStore';
 import { getImagePath } from '../utils/imageUtils';
 
@@ -24,16 +23,11 @@ const SearchPage = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  // Firebase에서 stadiums 데이터 가져오기
+  // MongoDB에서 stadiums 데이터 가져오기
   useEffect(() => {
     const fetchStadiums = async () => {
       try {
-        const stadiumsCollection = collection(db, 'stadiums');
-        const stadiumsSnapshot = await getDocs(stadiumsCollection);
-        const stadiumsList = stadiumsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const stadiumsList = await api.getStadiums();
         setStadiums(stadiumsList);
       } catch (error) {
         console.error('Error fetching stadiums:', error);
@@ -45,7 +39,7 @@ const SearchPage = () => {
     fetchStadiums();
   }, []);
 
-  // 선택된 Stadium의 categories 서브컬렉션 가져오기
+  // 선택된 Stadium의 categories 가져오기
   useEffect(() => {
     const fetchCategories = async () => {
       if (!selectedStadium) {
@@ -56,12 +50,7 @@ const SearchPage = () => {
 
       setLoadingCategories(true);
       try {
-        const categoriesCollection = collection(db, 'stadiums', selectedStadium.id, 'categories');
-        const categoriesSnapshot = await getDocs(categoriesCollection);
-        const categoriesList = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const categoriesList = await api.getCategories(selectedStadium.id);
         setCategories(categoriesList);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -73,7 +62,7 @@ const SearchPage = () => {
     fetchCategories();
   }, [selectedStadium]);
 
-  // 선택된 Category의 brands 서브컬렉션 가져오기
+  // 선택된 Category의 brands 가져오기
   useEffect(() => {
     const fetchBrands = async () => {
       if (!selectedStadium || !selectedCategory) {
@@ -84,19 +73,7 @@ const SearchPage = () => {
 
       setLoadingBrands(true);
       try {
-        const brandsCollection = collection(
-          db, 
-          'stadiums', 
-          selectedStadium.id, 
-          'categories', 
-          selectedCategory.id, 
-          'brands'
-        );
-        const brandsSnapshot = await getDocs(brandsCollection);
-        const brandsList = brandsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const brandsList = await api.getBrands(selectedCategory.id);
         setBrands(brandsList);
       } catch (error) {
         console.error('Error fetching brands:', error);
@@ -108,7 +85,7 @@ const SearchPage = () => {
     fetchBrands();
   }, [selectedStadium, selectedCategory]);
 
-  // 선택된 Brand의 items 서브컬렉션 가져오기
+  // 선택된 Brand의 items 가져오기
   useEffect(() => {
     const fetchItems = async () => {
       if (!selectedStadium || !selectedCategory || !selectedBrand) {
@@ -118,21 +95,7 @@ const SearchPage = () => {
 
       setLoadingItems(true);
       try {
-        const itemsCollection = collection(
-          db, 
-          'stadiums', 
-          selectedStadium.id, 
-          'categories', 
-          selectedCategory.id, 
-          'brands',
-          selectedBrand.id,
-          'items'
-        );
-        const itemsSnapshot = await getDocs(itemsCollection);
-        const itemsList = itemsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const itemsList = await api.getItems(selectedBrand.id);
         setItems(itemsList);
       } catch (error) {
         console.error('Error fetching items:', error);

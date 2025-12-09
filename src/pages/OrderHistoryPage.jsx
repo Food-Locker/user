@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Receipt } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { api } from '../lib/mongodb';
 import { auth } from '../lib/firebase';
 import { getImagePath } from '../utils/imageUtils';
 
@@ -18,21 +17,8 @@ const OrderHistoryPage = () => {
       }
 
       try {
-        // Firebase에서 완료된 주문 가져오기
-        const ordersRef = collection(db, 'orders');
-        const q = query(
-          ordersRef,
-          where('userId', '==', auth.currentUser.uid),
-          where('status', '==', 'completed'),
-          orderBy('createdAt', 'desc')
-        );
-
-        const snapshot = await getDocs(q);
-        const ordersList = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-
+        // MongoDB에서 완료된 주문 가져오기
+        const ordersList = await api.getOrders(auth.currentUser.uid, 'completed');
         setOrders(ordersList);
       } catch (error) {
         console.error('Error fetching orders:', error);
