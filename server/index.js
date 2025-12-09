@@ -206,11 +206,24 @@ app.patch('/api/orders/:orderId/status', async (req, res) => {
 // 사용자 생성 (회원가입)
 app.post('/api/users', async (req, res) => {
   try {
-    const { userId, name, email, newsletter, authProvider } = req.body;
+    const { userId, name, email, phone, newsletter, authProvider } = req.body;
+    
+    // 디버깅: 받은 데이터 확인
+    console.log('받은 사용자 데이터:', { userId, name, email, phone, newsletter, authProvider });
     
     // 이미 존재하는 사용자인지 확인
     const existingUser = await db.collection('users').findOne({ userId });
     if (existingUser) {
+      // 기존 사용자가 있으면 phone 필드 업데이트 (phone이 전달된 경우)
+      if (phone !== undefined) {
+        await db.collection('users').updateOne(
+          { userId },
+          { $set: { phone: phone || '', updatedAt: new Date().toISOString() } }
+        );
+        const updatedUser = await db.collection('users').findOne({ userId });
+        console.log('기존 사용자 phone 업데이트 완료:', updatedUser.phone);
+        return res.json({ ...updatedUser, id: updatedUser._id.toString() });
+      }
       return res.json({ ...existingUser, id: existingUser._id.toString() });
     }
 
@@ -218,14 +231,18 @@ app.post('/api/users', async (req, res) => {
       userId,
       name,
       email,
+      phone: phone || '',
       newsletter: newsletter || false,
       authProvider: authProvider || 'email', // 'email', 'google', 'naver', 'kakao'
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
 
+    console.log('저장할 사용자 데이터:', userData);
     const result = await db.collection('users').insertOne(userData);
-    res.json({ id: result.insertedId.toString(), ...userData });
+    const savedUser = { id: result.insertedId.toString(), ...userData };
+    console.log('사용자 저장 완료:', savedUser);
+    res.json(savedUser);
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: '사용자 생성 중 오류가 발생했습니다.' });

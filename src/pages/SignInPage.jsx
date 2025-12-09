@@ -49,6 +49,7 @@ const SignInPage = () => {
             userId: user.uid,
             name: user.displayName || '사용자',
             email: user.email || '',
+            phone: '',
             newsletter: false,
             authProvider: 'google'
           });

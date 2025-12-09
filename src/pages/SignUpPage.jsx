@@ -8,6 +8,7 @@ import { api } from '../lib/mongodb';
 const SignUpPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -41,13 +42,16 @@ const SignUpPage = () => {
 
       // MongoDB에 사용자 정보 저장 (실패해도 회원가입은 성공으로 처리)
       try {
-        await api.createUser({
+        const userData = {
           userId: user.uid,
           name: name,
           email: email,
+          phone: phone,
           newsletter: newsletter,
           authProvider: 'email'
-        });
+        };
+        console.log('MongoDB에 저장할 사용자 데이터:', userData);
+        await api.createUser(userData);
       } catch (dbError) {
         console.error('MongoDB 사용자 저장 오류:', dbError);
         // MongoDB 저장 실패해도 회원가입은 진행 (Firebase Auth는 성공했으므로)
@@ -80,6 +84,7 @@ const SignUpPage = () => {
           userId: user.uid,
           name: user.displayName || name || '사용자',
           email: user.email || email,
+          phone: phone || '',
           newsletter: newsletter,
           authProvider: 'google'
         });
@@ -129,6 +134,17 @@ const SignUpPage = () => {
               placeholder="이메일"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+
+          <div>
+            <input
+              type="tel"
+              placeholder="전화번호"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />

@@ -1,9 +1,32 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../lib/firebase';
+import { api } from '../lib/mongodb';
 
 const MyPage = () => {
   const [user] = useAuthState(auth);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (user?.uid) {
+        try {
+          const userData = await api.getUser(user.uid);
+          setUserInfo(userData);
+        } catch (error) {
+          console.error('사용자 정보 가져오기 오류:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -15,7 +38,7 @@ const MyPage = () => {
         <div className="mb-6">
           <Link to="/profile" className="flex items-center justify-between py-3">
             <span className="text-lg font-semibold text-gray-900">
-              {user?.displayName || '조용필'}님&gt;
+              {loading ? '로딩 중...' : (userInfo?.name || user?.displayName || '사용자')}님&gt;
             </span>
           </Link>
         </div>

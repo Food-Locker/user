@@ -1,9 +1,33 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../lib/firebase';
+import { api } from '../lib/mongodb';
+import { formatPhoneNumber } from '../utils/phoneUtils';
 
 const ProfilePage = () => {
   const [user] = useAuthState(auth);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (user?.uid) {
+        try {
+          const userData = await api.getUser(user.uid);
+          setUserInfo(userData);
+        } catch (error) {
+          console.error('사용자 정보 가져오기 오류:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -17,26 +41,24 @@ const ProfilePage = () => {
             👤
           </div>
           <div className="text-center space-y-2">
-            <p className="text-gray-600">Name</p>
+            <p className="text-gray-600">이름</p>
             <p className="text-lg font-semibold text-gray-900">
-              {user?.displayName || 'Amy Young'}
+              {loading ? '로딩 중...' : (userInfo?.name || user?.displayName || '사용자')}
             </p>
           </div>
         </div>
 
         <div className="space-y-4 mb-6">
           <div>
-            <p className="text-gray-600 text-sm mb-1">Department</p>
-            <p className="text-gray-900 font-medium">Technology</p>
-          </div>
-          <div>
-            <p className="text-gray-600 text-sm mb-1">Phone no.</p>
-            <p className="text-gray-900 font-medium">+98 1245560090</p>
-          </div>
-          <div>
-            <p className="text-gray-600 text-sm mb-1">E-Mail</p>
+            <p className="text-gray-600 text-sm mb-1">전화번호</p>
             <p className="text-gray-900 font-medium">
-              {user?.email || 'amyoung@random.com'}
+              {loading ? '로딩 중...' : (userInfo?.phone ? formatPhoneNumber(userInfo.phone) : '등록되지 않음')}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-600 text-sm mb-1">이메일</p>
+            <p className="text-gray-900 font-medium">
+              {userInfo?.email || user?.email || '등록되지 않음'}
             </p>
           </div>
         </div>
