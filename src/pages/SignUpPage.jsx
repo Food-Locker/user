@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { api } from '../lib/mongodb';
 
@@ -39,7 +39,7 @@ const SignUpPage = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // MongoDB에 사용자 정보 저장
+      // MongoDB에 사용자 정보 저장 (실패해도 회원가입은 성공으로 처리)
       try {
         await api.createUser({
           userId: user.uid,
@@ -50,14 +50,17 @@ const SignUpPage = () => {
         });
       } catch (dbError) {
         console.error('MongoDB 사용자 저장 오류:', dbError);
-        // MongoDB 저장 실패해도 회원가입은 진행
+        // MongoDB 저장 실패해도 회원가입은 진행 (Firebase Auth는 성공했으므로)
       }
 
-      // 회원가입 성공 팝업 표시
+      // 회원가입 성공 후 로그아웃 (팝업을 표시하기 위해)
+      await signOut(auth);
+
+      // Firebase Auth 성공 시 회원가입 성공 팝업 표시
+      setLoading(false);
       setShowSuccessModal(true);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -71,7 +74,7 @@ const SignUpPage = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // MongoDB에 사용자 정보 저장
+      // MongoDB에 사용자 정보 저장 (실패해도 회원가입은 성공으로 처리)
       try {
         await api.createUser({
           userId: user.uid,
@@ -82,14 +85,17 @@ const SignUpPage = () => {
         });
       } catch (dbError) {
         console.error('MongoDB 사용자 저장 오류:', dbError);
-        // MongoDB 저장 실패해도 회원가입은 진행
+        // MongoDB 저장 실패해도 회원가입은 진행 (Firebase Auth는 성공했으므로)
       }
 
-      // 회원가입 성공 팝업 표시
+      // 회원가입 성공 후 로그아웃 (팝업을 표시하기 위해)
+      await signOut(auth);
+
+      // Firebase Auth 성공 시 회원가입 성공 팝업 표시
+      setLoading(false);
       setShowSuccessModal(true);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };

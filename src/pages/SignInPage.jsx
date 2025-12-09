@@ -21,6 +21,7 @@ const SignInPage = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // 로그인 성공 팝업 표시
+      setLoading(false);
       setShowSuccessModal(true);
     } catch (err) {
       setError(err.message);
@@ -57,6 +58,7 @@ const SignInPage = () => {
       }
 
       // 로그인 성공 팝업 표시
+      setLoading(false);
       setShowSuccessModal(true);
     } catch (err) {
       setError(err.message);

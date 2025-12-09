@@ -77,13 +77,26 @@ export const api = {
 
   // Users
   createUser: async (userData) => {
-    const response = await fetch(`${API_BASE_URL}/api/users`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    });
-    if (!response.ok) throw new Error('사용자 생성 중 오류가 발생했습니다.');
-    return response.json();
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      if (!response.ok) {
+        // 404 에러인 경우 서버가 실행되지 않은 것으로 간주
+        if (response.status === 404) {
+          console.warn('백엔드 서버가 실행되지 않았습니다. MongoDB 저장을 건너뜁니다.');
+          return null;
+        }
+        throw new Error('사용자 생성 중 오류가 발생했습니다.');
+      }
+      return response.json();
+    } catch (error) {
+      // 네트워크 오류나 서버 오류 시에도 에러를 던지지 않고 null 반환
+      console.warn('MongoDB 사용자 저장 실패:', error.message);
+      return null;
+    }
   },
 
   getUser: async (userId) => {

@@ -66,11 +66,11 @@ function App() {
           <Route path="/" element={<SplashPage />} />
           <Route 
             path="/signin" 
-            element={user ? <Navigate to="/home" /> : <SignInPage />} 
+            element={<SignInPage />} 
           />
           <Route 
             path="/signup" 
-            element={user ? <Navigate to="/home" /> : <SignUpPage />} 
+            element={<SignUpPage />} 
           />
           
           {/* Protected Routes */}
