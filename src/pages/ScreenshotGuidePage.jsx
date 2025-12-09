@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Camera, Home, Search, ShoppingCart, CreditCard, Package, Receipt, User, Heart } from 'lucide-react';
+import { Camera, Home, Search, ShoppingCart, CreditCard, Package, Receipt, User } from 'lucide-react';
 
 const ScreenshotGuidePage = () => {
   const pages = [
@@ -31,7 +31,6 @@ const ScreenshotGuidePage = () => {
       category: '기타',
       items: [
         { path: '/mypage', name: 'MyPage', icon: User, description: '마이페이지' },
-        { path: '/wishlist', name: 'WishlistPage', icon: Heart, description: '관심목록' },
       ]
     },
   ];

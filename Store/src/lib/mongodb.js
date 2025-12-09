@@ -49,5 +49,12 @@ export const api = {
     if (!response.ok) throw new Error('Stadiums를 가져오는 중 오류가 발생했습니다.');
     return response.json();
   },
+
+  // Brand 정보 가져오기
+  getBrand: async (brandId) => {
+    const response = await fetch(`${API_BASE_URL}/api/brands/${brandId}`);
+    if (!response.ok) throw new Error('Brand를 가져오는 중 오류가 발생했습니다.');
+    return response.json();
+  },
 };
 

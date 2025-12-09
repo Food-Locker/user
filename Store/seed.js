@@ -114,6 +114,25 @@ async function seedStoreManagers() {
       console.log('⚠️ 생성할 매장 관리자 계정이 없습니다.');
     }
 
+    // 전체 주문 관리자 계정 생성
+    const adminAccount = {
+      username: 'admin',
+      password: 'admin123',
+      role: 'admin',
+      isAdmin: true,
+      brandId: null,
+      brandName: '전체 관리자',
+      stadiumId: null,
+      stadiumName: '전체',
+      createdAt: new Date().toISOString()
+    };
+
+    // 기존 admin 계정이 있으면 삭제 후 재생성
+    await db.collection('store-managers').deleteOne({ username: 'admin' });
+    await db.collection('store-managers').insertOne(adminAccount);
+    console.log('\n✅ 전체 주문 관리자 계정 생성 완료');
+    console.log('   아이디: admin / 비밀번호: admin123');
+
     console.log('\n✅ 매장 관리자 시드 완료!');
   } catch (error) {
     console.error('매장 관리자 시드 중 오류:', error);

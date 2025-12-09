@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import StoreOrderPage from './pages/StoreOrderPage';
+import AllOrdersPage from './pages/AllOrdersPage';
 import LoginPage from './pages/LoginPage';
 
 function App() {
   const [manager, setManager] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showAllOrders, setShowAllOrders] = useState(false);
 
   useEffect(() => {
     // localStorage에서 저장된 매장 관리자 정보 확인
@@ -27,6 +29,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('storeManager');
     setManager(null);
+    setShowAllOrders(false);
   };
 
   if (loading) {
@@ -41,7 +44,13 @@ function App() {
     return <LoginPage onLogin={handleLogin} />;
   }
 
-  return <StoreOrderPage manager={manager} onLogout={handleLogout} />;
+  // 전체 관리자 계정이면 전체 주문 페이지 표시
+  if (manager.isAdmin || manager.role === 'admin') {
+    return <AllOrdersPage onBack={null} onLogout={handleLogout} />;
+  }
+
+  // 일반 매장 관리자는 매장별 주문 페이지 표시
+  return <StoreOrderPage manager={manager} onLogout={handleLogout} onShowAllOrders={null} />;
 }
 
 export default App;

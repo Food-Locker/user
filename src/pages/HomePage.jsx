@@ -103,18 +103,18 @@ const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 pb-20">
       {/* Header with Settings and Bell icons */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-4 pt-5 pb-6 border-b border-gray-100 shadow-sm">
+      <div className="sticky top-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm z-10 px-4 pt-5 pb-6 border-b border-gray-100 dark:border-gray-700 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <Link to="/settings" className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
-            <Settings size={22} className="text-gray-700" />
+          <Link to="/settings" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <Settings size={22} className="text-gray-700 dark:text-gray-300" />
           </Link>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
             Food Locker!
           </h1>
-          <Link to="/notifications" className="p-2 rounded-xl hover:bg-gray-100 transition-colors relative">
-            <Bell size={22} className="text-gray-700" />
+          <Link to="/notifications" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative">
+            <Bell size={22} className="text-gray-700 dark:text-gray-300" />
             {getItemCount() > 0 && (
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             )}
@@ -123,9 +123,9 @@ const HomePage = () => {
         
         {/* Search Bar */}
         <Link to="/search">
-          <div className="flex items-center bg-white rounded-2xl px-4 py-3.5 border-2 border-gray-100 hover:border-primary/30 hover:shadow-md transition-all duration-200 shadow-soft">
-            <Search size={20} className="text-gray-400 mr-3" />
-            <span className="text-gray-500 font-medium">야구장 검색!</span>
+          <div className="flex items-center bg-white dark:bg-gray-800 rounded-2xl px-4 py-3.5 border-2 border-gray-100 dark:border-gray-700 hover:border-primary/30 hover:shadow-md transition-all duration-200 shadow-soft">
+            <Search size={20} className="text-gray-400 dark:text-gray-500 mr-3" />
+            <span className="text-gray-500 dark:text-gray-400 font-medium">야구장 검색!</span>
           </div>
         </Link>
       </div>
@@ -133,8 +133,8 @@ const HomePage = () => {
       {/* Categories Section */}
       <div className="px-4 pt-6 pb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">카테고리</h2>
-          <span className="text-xs text-gray-400">{categories.length}개</span>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">카테고리</h2>
+          <span className="text-xs text-gray-400 dark:text-gray-500">{categories.length}개</span>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
           {loading ? (
@@ -153,7 +153,7 @@ const HomePage = () => {
                   className={`flex-shrink-0 flex flex-col items-center rounded-2xl p-5 min-w-[110px] relative transition-all duration-300 ${
                     isActive 
                       ? 'bg-gradient-to-br from-primary to-primary/90 shadow-lg scale-105 transform' 
-                      : 'bg-white border-2 border-gray-100 hover:border-primary/30 hover:shadow-md hover:scale-[1.02]'
+                      : 'bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-primary/30 hover:shadow-md hover:scale-[1.02]'
                   }`}
                 >
                   {/* Category Image with gradient overlay */}
@@ -175,7 +175,7 @@ const HomePage = () => {
                     />
                   </div>
                   <span className={`text-sm font-bold mb-2 transition-colors ${
-                    isActive ? 'text-white' : 'text-gray-800'
+                    isActive ? 'text-white' : 'text-gray-800 dark:text-white'
                   }`}>
                     {category.nameKo || category.name}
                   </span>
@@ -198,10 +198,10 @@ const HomePage = () => {
       {/* Recommended Section */}
       <div className="px-4 pt-2 pb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             {categories.find(cat => cat.id === selectedCategory)?.nameKo || categories.find(cat => cat.id === selectedCategory)?.name || '메뉴'}
           </h2>
-          <span className="text-xs text-primary font-semibold bg-primary/10 px-2 py-1 rounded-full">
+          <span className="text-xs text-primary font-semibold bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-full">
             {recommendedItems.length}개
           </span>
         </div>
@@ -211,11 +211,11 @@ const HomePage = () => {
             <Link
               key={item.id}
               to={`/item/${item.id}`}
-              className="bg-white rounded-2xl overflow-hidden border-2 border-gray-50 relative shadow-soft hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 group"
+              className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border-2 border-gray-50 dark:border-gray-700 relative shadow-soft hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:border-primary/20 group"
               style={{ animationDelay: `${index * 50}ms` }}
             >
               {/* Food Image with gradient overlay */}
-              <div className="w-full h-52 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+              <div className="w-full h-52 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent z-10"></div>
                 <img 
                   src={item.image} 
@@ -240,9 +240,9 @@ const HomePage = () => {
               
               {/* Content */}
               <div className="p-4 pb-16">
-                <h3 className="font-bold text-gray-900 mb-2 text-base">{item.name}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-base">{item.name}</h3>
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs text-gray-500 font-medium">{item.description}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{item.description}</span>
                   <span className="text-primary font-bold text-lg">${item.price}</span>
                 </div>
               </div>

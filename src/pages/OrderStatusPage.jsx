@@ -69,9 +69,9 @@ const OrderStatusPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
-      <div className="px-4 py-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900">주문 현황</h1>
+    <div className="min-h-screen bg-white dark:bg-gray-900 pb-24">
+      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">주문 현황</h1>
       </div>
 
       <div className="px-4 py-6">
@@ -79,12 +79,12 @@ const OrderStatusPage = () => {
           <div className="min-h-[60vh] flex items-center justify-center">
             <div className="text-center max-w-sm w-full">
               <div className="mb-6 flex justify-center">
-                <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center">
+                <div className="w-32 h-32 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center">
                   <Package size={64} className="text-primary" strokeWidth={1.5} />
                 </div>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">진행중인 주문이 없습니다</h2>
-              <p className="text-sm text-gray-500 mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">진행중인 주문이 없습니다</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                 새로운 주문을 해보세요
               </p>
               <button

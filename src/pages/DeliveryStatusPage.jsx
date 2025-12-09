@@ -131,7 +131,7 @@ const DeliveryStatusPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-32">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pb-32">
       {/* Header */}
       <div className="bg-primary px-4 py-4">
         <div className="flex items-center">
@@ -148,26 +148,26 @@ const DeliveryStatusPage = () => {
       <div className="px-4 py-6">
         {/* 배달 아이콘 */}
         <div className="flex justify-center mb-6">
-          <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center">
+          <div className="w-32 h-32 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center">
             <Package size={64} className="text-primary" strokeWidth={1.5} />
           </div>
         </div>
 
         {/* 메인 메시지 */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             주문이 접수되었습니다!
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             관리자 확인 후 조리가 시작됩니다.
           </p>
         </div>
 
-        <div className="border-t border-gray-200 pt-6 mt-6">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
           {/* 배달 상태 섹션 */}
           <div className="flex items-center mb-4">
-            <Package size={20} className="text-gray-700 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">배달 상태</h3>
+            <Package size={20} className="text-gray-700 dark:text-gray-300 mr-2" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">배달 상태</h3>
           </div>
 
           {/* 상태 카드들 */}

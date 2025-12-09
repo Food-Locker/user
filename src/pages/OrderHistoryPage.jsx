@@ -17,9 +17,15 @@ const OrderHistoryPage = () => {
       }
 
       try {
-        // MongoDB에서 완료된 주문 가져오기
-        const ordersList = await api.getOrders(auth.currentUser.uid, 'completed');
-        setOrders(ordersList);
+        // MongoDB에서 모든 주문 가져오기 (상태 필터 없이)
+        const allOrders = await api.getOrders(auth.currentUser.uid, null);
+        // 완료된 주문만 필터링 (completed, delivered 상태)
+        const completedOrders = allOrders.filter(
+          order => order.status === 'completed' || order.status === 'delivered'
+        );
+        // 최신 주문부터 정렬
+        completedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setOrders(completedOrders);
       } catch (error) {
         console.error('Error fetching orders:', error);
         // 에러 발생 시 localStorage에서 가져오기 (호환성)

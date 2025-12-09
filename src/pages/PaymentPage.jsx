@@ -89,29 +89,29 @@ const PaymentPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
-      <div className="px-4 py-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900">결제화면</h1>
+    <div className="min-h-screen bg-white dark:bg-gray-900 pb-24">
+      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">결제화면</h1>
       </div>
 
       <div className="px-4 py-6 space-y-6">
         <div>
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
             수령방법
           </h2>
-          <div className="bg-primary/5 border-2 border-primary rounded-xl p-4 shadow-soft">
+          <div className="bg-primary/5 dark:bg-primary/10 border-2 border-primary rounded-xl p-4 shadow-soft">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="font-semibold text-gray-900">락커 배달</h3>
-                <p className="text-sm text-gray-600">10-15분 후 도착</p>
+                <h3 className="font-semibold text-gray-900 dark:text-white">락커 배달</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">10-15분 후 도착</p>
               </div>
-              <span className="font-semibold text-gray-900">1,000원</span>
+              <span className="font-semibold text-gray-900 dark:text-white">1,000원</span>
             </div>
           </div>
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
             결제수단을 선택해주세요*
           </h2>
           <div className="space-y-3">
@@ -119,13 +119,13 @@ const PaymentPage = () => {
               onClick={() => setPaymentMethod('card')}
               className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'card'
-                  ? 'border-primary bg-primary/5 shadow-soft'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  ? 'border-primary bg-primary/5 dark:bg-primary/10 shadow-soft'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <div className="flex items-center">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">신용/체크카드</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">신용/체크카드</h3>
                 </div>
                 {paymentMethod === 'card' && (
                   <span className="text-primary">✓</span>
@@ -137,13 +137,13 @@ const PaymentPage = () => {
               onClick={() => setPaymentMethod('kakao')}
               className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'kakao'
-                  ? 'border-primary bg-primary/5 shadow-soft'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  ? 'border-primary bg-primary/5 dark:bg-primary/10 shadow-soft'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <div className="flex items-center">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">카카오페이</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">카카오페이</h3>
                 </div>
                 {paymentMethod === 'kakao' && (
                   <span className="text-primary">✓</span>
@@ -155,13 +155,13 @@ const PaymentPage = () => {
               onClick={() => setPaymentMethod('naver')}
               className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'naver'
-                  ? 'border-primary bg-primary/5 shadow-soft'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  ? 'border-primary bg-primary/5 dark:bg-primary/10 shadow-soft'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <div className="flex items-center">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">네이버페이</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">네이버페이</h3>
                 </div>
                 {paymentMethod === 'naver' && (
                   <span className="text-primary">✓</span>
@@ -173,13 +173,13 @@ const PaymentPage = () => {
               onClick={() => setPaymentMethod('toss')}
               className={`w-full p-4 border-2 rounded-xl text-left transition-all duration-200 ${
                 paymentMethod === 'toss'
-                  ? 'border-primary bg-primary/5 shadow-soft'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  ? 'border-primary bg-primary/5 dark:bg-primary/10 shadow-soft'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}
             >
               <div className="flex items-center">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">토스페이</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">토스페이</h3>
                 </div>
                 {paymentMethod === 'toss' && (
                   <span className="text-primary">✓</span>
@@ -190,15 +190,15 @@ const PaymentPage = () => {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
             결제금액을 확인해주세요
           </h2>
-          <div className="bg-gray-50 rounded-xl p-4 space-y-3 shadow-soft">
-            <div className="flex justify-between text-gray-700">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 space-y-3 shadow-soft">
+            <div className="flex justify-between text-gray-700 dark:text-gray-300">
               <span>메뉴 금액</span>
               <span>{menuTotal.toLocaleString()}원</span>
             </div>
-            <div className="flex justify-between text-gray-700">
+            <div className="flex justify-between text-gray-700 dark:text-gray-300">
               <span>배달팁</span>
               <span>{deliveryFee.toLocaleString()}원</span>
             </div>
@@ -206,22 +206,22 @@ const PaymentPage = () => {
               <span>메뉴할인</span>
               <span>-{discount.toLocaleString()}원</span>
             </div>
-            <div className="flex justify-between font-bold text-lg pt-3 border-t border-gray-200">
-              <span>최종 결제금액</span>
+            <div className="flex justify-between font-bold text-lg pt-3 border-t border-gray-200 dark:border-gray-700">
+              <span className="dark:text-white">최종 결제금액</span>
               <span className="text-primary">{finalTotal.toLocaleString()}원</span>
             </div>
           </div>
         </div>
 
         {hasSeat() ? (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <p className="text-sm text-blue-800 dark:text-blue-300">
               좌석 정보: {seatBlock}블록 {seatNumber}번
             </p>
           </div>
         ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-sm text-yellow-800">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <p className="text-sm text-yellow-800 dark:text-yellow-300">
               ⚠️ 결제하기 전에 좌석 정보를 입력해주세요.
             </p>
           </div>

@@ -93,6 +93,21 @@ app.get('/api/categories/:categoryId/brands', async (req, res) => {
   }
 });
 
+// 특정 Brand 정보 가져오기
+app.get('/api/brands/:brandId', async (req, res) => {
+  try {
+    const { brandId } = req.params;
+    const brand = await db.collection('brands').findOne({ _id: new ObjectId(brandId) });
+    if (!brand) {
+      return res.status(404).json({ error: 'Brand를 찾을 수 없습니다.' });
+    }
+    res.json({ ...brand, id: brand._id.toString() });
+  } catch (error) {
+    console.error('Error fetching brand:', error);
+    res.status(500).json({ error: 'Brand를 가져오는 중 오류가 발생했습니다.' });
+  }
+});
+
 // ========== Items API ==========
 // 특정 Brand의 Items 가져오기
 app.get('/api/brands/:brandId/items', async (req, res) => {
@@ -334,10 +349,12 @@ app.post('/api/store-managers/login', async (req, res) => {
       manager: {
         id: manager._id.toString(),
         username: manager.username,
-        brandId: manager.brandId,
-        brandName: manager.brandName,
-        stadiumId: manager.stadiumId,
-        stadiumName: manager.stadiumName
+        brandId: manager.brandId || null,
+        brandName: manager.brandName || '전체 관리자',
+        stadiumId: manager.stadiumId || null,
+        stadiumName: manager.stadiumName || '전체',
+        role: manager.role || 'store',
+        isAdmin: manager.isAdmin || false
       }
     });
   } catch (error) {

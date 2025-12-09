@@ -118,22 +118,22 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-32">
-      <div className="px-4 py-4 border-b border-gray-200">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pb-32">
+      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <button 
             onClick={() => navigate('/home')}
             className="mr-4"
           >
-            <ArrowLeft size={24} className="text-gray-700" />
+            <ArrowLeft size={24} className="text-gray-700 dark:text-gray-300" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 flex-1">검색</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex-1">검색</h1>
         </div>
       </div>
 
       <div className="px-4 py-6 space-y-6">
         <div>
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">구장</h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">구장</h2>
           {loading ? (
             <div className="grid grid-cols-4 gap-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (

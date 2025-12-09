@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Clock, UtensilsCrossed, CheckCircle2, RefreshCw, Home, Users, LogOut, MapPin, Package, Eye } from 'lucide-react';
+import { Clock, UtensilsCrossed, CheckCircle2, RefreshCw, Home, LogOut, MapPin, Package, ArrowLeft } from 'lucide-react';
 import { api } from '../lib/mongodb';
 
-const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
+const AllOrdersPage = ({ onBack, onLogout }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [stadiums, setStadiums] = useState([]);
+  const [brandsMap, setBrandsMap] = useState({});
 
-  // 주문 목록 가져오기 (received, cooking, completed 상태, 로그인한 매니저의 brandId로 필터링)
+  // 주문 목록 가져오기 (모든 주문, brandId 필터링 없이)
   const fetchOrders = async () => {
     try {
-      // 로그인한 매니저의 brandId로 필터링하여 주문 가져오기
-      const brandId = manager?.brandId;
-      const allOrders = await api.getOrders(null, null, brandId);
-      // received, cooking, completed 상태만 필터링 (delivered는 제외)
+      // brandId 없이 모든 주문 가져오기
+      const allOrders = await api.getOrders(null, null, null);
+      // received, cooking, completed 상태만 필터링
       const activeOrders = allOrders.filter(
         order => order.status === 'received' || order.status === 'cooking' || order.status === 'completed'
       );
@@ -22,9 +21,11 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
       activeOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setOrders(activeOrders);
       setLoading(false);
+      return activeOrders;
     } catch (error) {
       console.error('Error fetching orders:', error);
       setLoading(false);
+      return [];
     }
   };
 
@@ -39,14 +40,51 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
       }
     };
 
-    fetchStadiums();
-    fetchOrders();
+    // Brands 정보 가져오기 (주문의 brandIds를 통해)
+    const fetchBrands = async (ordersList) => {
+      const brandIds = new Set();
+      ordersList.forEach(order => {
+        if (order.brandIds && Array.isArray(order.brandIds)) {
+          order.brandIds.forEach(id => brandIds.add(id));
+        }
+      });
+
+      const brands = {};
+      for (const brandId of brandIds) {
+        try {
+          const brand = await api.getBrand(brandId);
+          brands[brandId] = brand;
+        } catch (error) {
+          console.error(`Error fetching brand ${brandId}:`, error);
+        }
+      }
+      setBrandsMap(brands);
+    };
+
+    const loadData = async () => {
+      await fetchStadiums();
+      const ordersList = await fetchOrders();
+      if (ordersList && ordersList.length > 0) {
+        await fetchBrands(ordersList);
+      }
+    };
+
+    loadData();
 
     // 실시간 업데이트를 위한 폴링 (3초마다)
-    const intervalId = setInterval(fetchOrders, 3000);
+    const intervalId = setInterval(async () => {
+      try {
+        const ordersList = await fetchOrders();
+        if (ordersList && ordersList.length > 0) {
+          await fetchBrands(ordersList);
+        }
+      } catch (error) {
+        console.error('Error in polling:', error);
+      }
+    }, 3000);
 
     return () => clearInterval(intervalId);
-  }, [manager?.brandId]);
+  }, []);
 
   // Stadium 이름 가져오기
   const getStadiumName = (stadiumId) => {
@@ -55,85 +93,16 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
     return stadium?.name || '야구장';
   };
 
-  // 주문 상태 업데이트
-  const handleStatusUpdate = async (orderId, newStatus) => {
-    setUpdatingOrderId(orderId);
-    try {
-      await api.updateOrderStatus(orderId, newStatus);
-      // 상태 업데이트 후 목록 새로고침
-      await fetchOrders();
-    } catch (error) {
-      console.error('Error updating order status:', error);
-      alert('주문 상태 업데이트에 실패했습니다.');
-    } finally {
-      setUpdatingOrderId(null);
+  // Brand 이름 가져오기 (brandIds의 첫 번째 brandId 사용)
+  const getBrandName = (order) => {
+    if (order.brandIds && order.brandIds.length > 0) {
+      const firstBrandId = order.brandIds[0];
+      const brand = brandsMap[firstBrandId];
+      if (brand) {
+        return brand.name || brand.nameEn || '매장';
+      }
     }
-  };
-
-  // 상태별 버튼 렌더링
-  const renderStatusButton = (order) => {
-    if (order.status === 'received') {
-      return (
-        <button
-          onClick={() => handleStatusUpdate(order.id, 'cooking')}
-          disabled={updatingOrderId === order.id}
-          className="px-5 py-2.5 bg-gradient-to-r from-primary to-primary/90 text-white rounded-2xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-md"
-        >
-          {updatingOrderId === order.id ? (
-            <>
-              <RefreshCw size={16} className="animate-spin" />
-              처리 중...
-            </>
-          ) : (
-            <>
-              <UtensilsCrossed size={16} />
-              조리 시작
-            </>
-          )}
-        </button>
-      );
-    } else if (order.status === 'cooking') {
-      return (
-        <button
-          onClick={() => handleStatusUpdate(order.id, 'completed')}
-          disabled={updatingOrderId === order.id}
-          className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-md"
-        >
-          {updatingOrderId === order.id ? (
-            <>
-              <RefreshCw size={16} className="animate-spin" />
-              처리 중...
-            </>
-          ) : (
-            <>
-              <CheckCircle2 size={16} />
-              조리 완료
-            </>
-          )}
-        </button>
-      );
-    } else if (order.status === 'completed') {
-      return (
-        <button
-          onClick={() => handleStatusUpdate(order.id, 'delivered')}
-          disabled={updatingOrderId === order.id}
-          className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-md"
-        >
-          {updatingOrderId === order.id ? (
-            <>
-              <RefreshCw size={16} className="animate-spin" />
-              처리 중...
-            </>
-          ) : (
-            <>
-              <Package size={16} />
-              락커 배달 완료
-            </>
-          )}
-        </button>
-      );
-    }
-    return null;
+    return '매장 정보 없음';
   };
 
   // 상태 텍스트 및 색상
@@ -188,28 +157,24 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
-                <Home size={24} className="text-white" />
-              </div>
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                  <ArrowLeft size={24} className="text-gray-700" />
+                </button>
+              )}
               <div>
-                <h1 className="text-2xl font-bold gradient-text">Food Locker Store</h1>
+                <h1 className="text-2xl font-bold gradient-text">전체 주문 현황</h1>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  {manager?.stadiumName || '야구장'} 주문 관리 시스템
+                  모든 매장의 주문을 확인합니다
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {onShowAllOrders && (
-                <button
-                  onClick={onShowAllOrders}
-                  className="px-4 py-2.5 bg-gradient-to-r from-primary to-primary/90 text-white rounded-2xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 flex items-center gap-2 shadow-md"
-                >
-                  <Eye size={18} />
-                  전체 주문 보기
-                </button>
-              )}
               <button
                 onClick={fetchOrders}
                 className="px-4 py-2.5 bg-white border-2 border-gray-100 text-gray-700 rounded-2xl font-semibold hover:border-primary/30 hover:shadow-md transition-all duration-200 flex items-center gap-2 shadow-soft"
@@ -224,23 +189,6 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
                 <LogOut size={18} />
                 로그아웃
               </button>
-            </div>
-          </div>
-          {/* 매장 이름 중앙 표시 */}
-          <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border-2 border-primary/20 shadow-soft">
-              <Home size={18} className="text-primary" />
-              <span className="text-lg font-bold text-primary">
-                {manager?.brandName || '매장'}
-              </span>
-              {manager?.stadiumName && (
-                <>
-                  <span className="text-gray-400">·</span>
-                  <span className="text-sm font-semibold text-gray-600">
-                    {manager.stadiumName}
-                  </span>
-                </>
-              )}
             </div>
           </div>
         </div>
@@ -295,7 +243,7 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
                 <p className="text-3xl font-bold text-primary">{orders.length}</p>
               </div>
               <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center">
-                <Users size={26} className="text-primary" />
+                <Package size={26} className="text-primary" />
               </div>
             </div>
           </div>
@@ -344,6 +292,17 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
                             </p>
                           </div>
                         </div>
+                        
+                        {/* 매장 정보 */}
+                        <div className="ml-15 mb-2">
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                            <Home size={16} className="text-primary" />
+                            <p className="text-sm font-semibold text-primary">
+                              {getBrandName(order)}
+                            </p>
+                          </div>
+                        </div>
+                        
                         {order.stadiumId && (
                           <div className="ml-15 mb-2">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
@@ -354,6 +313,7 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
                             </div>
                           </div>
                         )}
+                        
                         {order.seatBlock && order.seatNumber && (
                           <div className="ml-15 mb-2">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border border-primary/20">
@@ -409,11 +369,6 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
                         ))}
                       </div>
                     </div>
-
-                    {/* 액션 버튼 */}
-                    <div className="border-t border-gray-100 pt-4 mt-4 flex justify-end">
-                      {renderStatusButton(order)}
-                    </div>
                   </div>
                 </div>
               );
@@ -425,5 +380,5 @@ const StoreOrderPage = ({ manager, onLogout, onShowAllOrders }) => {
   );
 };
 
-export default StoreOrderPage;
+export default AllOrdersPage;
 

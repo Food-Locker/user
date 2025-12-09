@@ -27,7 +27,6 @@ import CustomerServicePage from './pages/CustomerServicePage';
 import CustomerServiceInquiryPage from './pages/CustomerServiceInquiryPage';
 import CustomerServiceConfirmPage from './pages/CustomerServiceConfirmPage';
 import ItemDetailPage from './pages/ItemDetailPage';
-import WishlistPage from './pages/WishlistPage';
 import ScreenshotGuidePage from './pages/ScreenshotGuidePage';
 
 // Components
@@ -60,7 +59,7 @@ function AppContent() {
                      location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-white mobile-container">
+    <div className="min-h-screen bg-white dark:bg-gray-900 mobile-container">
       <Routes>
         <Route path="/screenshots" element={<ScreenshotGuidePage />} />
         <Route path="/" element={<SplashPage />} />
@@ -149,10 +148,6 @@ function AppContent() {
         <Route 
           path="/item/:id" 
           element={user ? <ItemDetailPage /> : <Navigate to="/signin" />} 
-        />
-        <Route 
-          path="/wishlist" 
-          element={user ? <WishlistPage /> : <Navigate to="/signin" />} 
         />
       </Routes>
 

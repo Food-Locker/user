@@ -29,32 +29,32 @@ const MyPage = () => {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-white pb-24">
-      <div className="px-4 py-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900">마이페이지</h1>
+    <div className="min-h-screen bg-white dark:bg-gray-900 pb-24">
+      <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">마이페이지</h1>
       </div>
 
       <div className="px-4 py-6">
         <div className="mb-6">
           <Link to="/profile" className="flex items-center justify-between py-3">
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">
               {loading ? '로딩 중...' : (userInfo?.name || user?.displayName || '사용자')}님&gt;
             </span>
           </Link>
         </div>
 
         <div className="flex gap-4 mb-6">
-          <div className="flex-1 bg-gray-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">적립금</p>
-            <p className="text-lg font-semibold text-gray-900">0원</p>
+          <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">적립금</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">0원</p>
           </div>
-          <div className="flex-1 bg-gray-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">볼락머니</p>
-            <p className="text-lg font-semibold text-gray-900">0원</p>
+          <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">볼락머니</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">0원</p>
           </div>
-          <div className="flex-1 bg-gray-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">쿠폰</p>
-            <p className="text-lg font-semibold text-gray-900">0장</p>
+          <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">쿠폰</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white">0장</p>
           </div>
         </div>
 
@@ -64,7 +64,7 @@ const MyPage = () => {
           </button>
           <Link
             to="/reviews"
-            className="block w-full py-3 bg-gray-100 text-gray-900 rounded-lg font-semibold text-center"
+            className="block w-full py-3 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg font-semibold text-center"
           >
             작성 가능한 후기 1개 &gt;
           </Link>
@@ -73,52 +73,52 @@ const MyPage = () => {
         <div className="space-y-2">
           <Link
             to="/order/history"
-            className="flex items-center justify-between py-4 border-b border-gray-200"
+            className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700"
           >
-            <span className="text-gray-900">주문내역</span>
-            <span className="text-gray-400">&gt;</span>
+            <span className="text-gray-900 dark:text-white">주문내역</span>
+            <span className="text-gray-400 dark:text-gray-500">&gt;</span>
           </Link>
           <Link
             to="/refunds"
-            className="flex items-center justify-between py-4 border-b border-gray-200"
+            className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700"
           >
-            <span className="text-gray-900">취소/환불 내역</span>
-            <span className="text-gray-400">&gt;</span>
+            <span className="text-gray-900 dark:text-white">취소/환불 내역</span>
+            <span className="text-gray-400 dark:text-gray-500">&gt;</span>
           </Link>
           <Link
             to="/favorites"
-            className="flex items-center justify-between py-4 border-b border-gray-200"
+            className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700"
           >
-            <span className="text-gray-900">즐겨찾는 매장</span>
-            <span className="text-gray-400">&gt;</span>
+            <span className="text-gray-900 dark:text-white">즐겨찾는 매장</span>
+            <span className="text-gray-400 dark:text-gray-500">&gt;</span>
           </Link>
           <Link
             to="/customer-service"
-            className="flex items-center justify-between py-4 border-b border-gray-200"
+            className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700"
           >
-            <span className="text-gray-900">고객센터</span>
-            <span className="text-gray-400">&gt;</span>
+            <span className="text-gray-900 dark:text-white">고객센터</span>
+            <span className="text-gray-400 dark:text-gray-500">&gt;</span>
           </Link>
           <Link
             to="/attendance"
-            className="flex items-center justify-between py-4 border-b border-gray-200"
+            className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700"
           >
-            <span className="text-gray-900">출석체크</span>
-            <span className="text-gray-400">&gt;</span>
+            <span className="text-gray-900 dark:text-white">출석체크</span>
+            <span className="text-gray-400 dark:text-gray-500">&gt;</span>
           </Link>
           <Link
             to="/events"
-            className="flex items-center justify-between py-4 border-b border-gray-200"
+            className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700"
           >
-            <span className="text-gray-900">이벤트</span>
-            <span className="text-gray-400">&gt;</span>
+            <span className="text-gray-900 dark:text-white">이벤트</span>
+            <span className="text-gray-400 dark:text-gray-500">&gt;</span>
           </Link>
           <Link
             to="/settings"
-            className="flex items-center justify-between py-4 border-b border-gray-200"
+            className="flex items-center justify-between py-4 border-b border-gray-200 dark:border-gray-700"
           >
-            <span className="text-gray-900">설정</span>
-            <span className="text-gray-400">&gt;</span>
+            <span className="text-gray-900 dark:text-white">설정</span>
+            <span className="text-gray-400 dark:text-gray-500">&gt;</span>
           </Link>
         </div>
       </div>
