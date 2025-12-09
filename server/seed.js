@@ -66,7 +66,7 @@ async function seedDatabase() {
     const jamsilCat1 = await db.collection('categories').insertOne({
       stadiumId: jamsilId,
       name: 'Noodle & Meal',
-      nameKo: '식사 & 면 요리',
+      nameKo: '식사',
       createdAt: new Date().toISOString()
     });
     const jamsilCat1Id = jamsilCat1.insertedId;
@@ -143,7 +143,7 @@ async function seedDatabase() {
     const gocheokCat1 = await db.collection('categories').insertOne({
       stadiumId: gocheokId,
       name: 'Shrimp & Chicken',
-      nameKo: '새우 & 치킨',
+      nameKo: '새우',
       createdAt: new Date().toISOString()
     });
     const gocheokCat1Id = gocheokCat1.insertedId;
@@ -378,7 +378,7 @@ async function seedDatabase() {
     const changwonCat1 = await db.collection('categories').insertOne({
       stadiumId: changwonId,
       name: 'Bakery & Cafe',
-      nameKo: '베이커리 & 카페',
+      nameKo: '베이커리',
       createdAt: new Date().toISOString()
     });
     const changwonCat1Id = changwonCat1.insertedId;
@@ -471,7 +471,7 @@ async function seedDatabase() {
 
     // Items
     await db.collection('items').insertMany([
-      { brandId: daeguBrand2Id, name: '세트3 (땅땅불갈비+허브순살)', price: 25900, createdAt: new Date().toISOString() }
+      { brandId: daeguBrand2Id, name: '허브순살', price: 25900, createdAt: new Date().toISOString() }
     ]);
 
     console.log('✅ 대구 삼성 라이온즈 파크 데이터 생성 완료');

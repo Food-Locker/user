@@ -12,28 +12,36 @@ const HomePage = () => {
   const [allItems, setAllItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // MongoDB에서 카테고리 가져오기 (첫 번째 stadium의 categories 사용)
+  // MongoDB에서 모든 카테고리 가져오기 (모든 stadium의 categories 수집)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const stadiums = await api.getStadiums();
+        const allCategoriesMap = new Map();
         
-        if (stadiums.length > 0) {
-          const firstStadium = stadiums[0];
-          const categoriesList = await api.getCategories(firstStadium.id);
+        // 모든 스타디움의 카테고리 수집
+        for (const stadium of stadiums) {
+          const categoriesList = await api.getCategories(stadium.id);
           
-          const categoriesWithImages = categoriesList.map((cat) => ({
-            ...cat,
-            nameKo: cat.nameKo || cat.name || '카테고리',
-            image: getCategoryImage(cat.name || cat.nameKo || '')
-          }));
-          
-          setCategories(categoriesWithImages);
-          
-          // 첫 번째 카테고리를 기본 선택
-          if (categoriesWithImages.length > 0 && !selectedCategory) {
-            setSelectedCategory(categoriesWithImages[0].id);
-          }
+          categoriesList.forEach((cat) => {
+            const categoryKey = cat.nameKo || cat.name;
+            // 중복 제거: 같은 nameKo를 가진 카테고리는 하나만 유지
+            if (!allCategoriesMap.has(categoryKey)) {
+              allCategoriesMap.set(categoryKey, {
+                ...cat,
+                nameKo: cat.nameKo || cat.name || '카테고리',
+                image: getCategoryImage(cat.nameKo || cat.name || '')
+              });
+            }
+          });
+        }
+        
+        const uniqueCategories = Array.from(allCategoriesMap.values());
+        setCategories(uniqueCategories);
+        
+        // 첫 번째 카테고리를 기본 선택
+        if (uniqueCategories.length > 0 && !selectedCategory) {
+          setSelectedCategory(uniqueCategories[0].id);
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -123,7 +131,7 @@ const HomePage = () => {
       {/* Categories Section */}
       <div className="px-4 pt-6 pb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Categories</h2>
+          <h2 className="text-xl font-bold text-gray-900">카테고리</h2>
           <span className="text-xs text-gray-400">{categories.length}개</span>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">

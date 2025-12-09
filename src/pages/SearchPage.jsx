@@ -127,13 +127,13 @@ const SearchPage = () => {
           >
             <ArrowLeft size={24} className="text-gray-700" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 flex-1">Search</h1>
+          <h1 className="text-2xl font-bold text-gray-900 flex-1">검색</h1>
         </div>
       </div>
 
       <div className="px-4 py-6 space-y-6">
         <div>
-          <h2 className="text-lg font-semibold mb-4 text-gray-900">Stadium</h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-900">구장</h2>
           {loading ? (
             <div className="grid grid-cols-4 gap-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -153,13 +153,23 @@ const SearchPage = () => {
                 return (
                   <button
                     key={stadium.id}
-                    onClick={() => setSelectedStadium(stadium)}
+                    onClick={() => {
+                      // 다른 스타디움을 선택하면 이전 선택 초기화
+                      if (selectedStadium?.id !== stadium.id) {
+                        setSelectedCategory(null);
+                        setSelectedBrand(null);
+                        setSelectedItem(null);
+                        setItems([]);
+                        setBrands([]);
+                      }
+                      setSelectedStadium(stadium);
+                    }}
                     className={`w-16 h-16 rounded-full flex items-center justify-center text-sm font-semibold mx-auto transition-all ${
                       isSelected
                         ? 'bg-primary text-white shadow-lg ring-2 ring-primary ring-offset-2 scale-105'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
-                    title={stadiumName || 'Stadium'}
+                    title={stadiumName || '구장'}
                   >
                     {firstTwoChars}
                   </button>
@@ -172,7 +182,7 @@ const SearchPage = () => {
         {/* Categories는 Stadium이 선택되었을 때만 표시 */}
         {selectedStadium && (
           <div>
-            <h2 className="text-lg font-semibold mb-4 text-gray-900">Category</h2>
+            <h2 className="text-lg font-semibold mb-4 text-gray-900">카테고리</h2>
             {loadingCategories ? (
               <div className="flex flex-wrap gap-2">
                 {[1, 2, 3, 4].map((i) => (
@@ -187,7 +197,7 @@ const SearchPage = () => {
               <div className="flex flex-wrap gap-2">
                 {categories.map((category) => {
                   const isSelected = selectedCategory?.id === category.id;
-                  const categoryName = category.name || category.categoryName || 'Category';
+                  const categoryName = category.nameKo || category.name || category.categoryName || '카테고리';
                   return (
                     <button
                       key={category.id}
@@ -212,7 +222,7 @@ const SearchPage = () => {
         {/* Brands는 Category가 선택되었을 때만 표시 */}
         {selectedStadium && selectedCategory && (
           <div>
-            <h2 className="text-lg font-semibold mb-4 text-gray-900">Brand</h2>
+            <h2 className="text-lg font-semibold mb-4 text-gray-900">브랜드</h2>
             {loadingBrands ? (
               <div className="flex flex-wrap gap-2">
                 {[1, 2, 3].map((i) => (
@@ -228,7 +238,7 @@ const SearchPage = () => {
                 {brands.map((brand) => {
                   const isSelected = selectedBrand?.id === brand.id;
                   // DB 필드명: name 또는 다른 가능한 필드명들
-                  const brandName = brand.name || brand.brandName || brand.title || 'Brand';
+                  const brandName = brand.name || brand.brandName || brand.title || '브랜드';
                   return (
                     <button
                       key={brand.id}
@@ -253,7 +263,7 @@ const SearchPage = () => {
         {/* Items는 Brand가 선택되었을 때만 표시 */}
         {selectedStadium && selectedCategory && selectedBrand && (
           <div>
-            <h2 className="text-lg font-semibold mb-4 text-gray-900">Food</h2>
+            <h2 className="text-lg font-semibold mb-4 text-gray-900">메뉴</h2>
             {loadingItems ? (
               <div className="grid grid-cols-2 gap-4">
                 {[1, 2, 3, 4].map((i) => (
@@ -267,7 +277,7 @@ const SearchPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 {items.map((item) => {
                   // DB 필드명: name 또는 다른 가능한 필드명들
-                  const itemName = item.name || item.itemName || item.title || 'Item';
+                  const itemName = item.name || item.itemName || item.title || '메뉴';
                   const itemPrice = item.price || item.itemPrice || 0;
                   const itemImage = getImagePath(itemName);
                   const isSelected = selectedItem?.id === item.id;
@@ -282,12 +292,13 @@ const SearchPage = () => {
                           : 'border-gray-100 hover:border-gray-200 hover:shadow-medium'
                       }`}
                     >
-                      <div className="w-full h-32 bg-gray-100 relative overflow-hidden">
+                      <div className="w-full h-44 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden rounded-t-xl flex items-center justify-center">
                         {itemImage ? (
                           <img 
                             src={itemImage} 
                             alt={itemName}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
+                            style={{ maxHeight: '100%', maxWidth: '100%' }}
                             onError={(e) => {
                               // 이미지 로드 실패 시 플레이스홀더 표시
                               e.target.style.display = 'none';
@@ -298,11 +309,11 @@ const SearchPage = () => {
                             }}
                           />
                         ) : null}
-                        <div className={`${itemImage ? 'hidden' : ''} image-placeholder w-full h-full flex items-center justify-center`}>
+                        <div className={`${itemImage ? 'hidden' : ''} image-placeholder w-full h-full flex items-center justify-center rounded-t-xl`}>
                           <img src="/hamburger.png" alt="placeholder" className="w-12 h-12 opacity-50" />
                         </div>
                       </div>
-                      <div className="p-3">
+                      <div className="p-3 rounded-b-xl">
                         <h3 className="font-semibold text-gray-900 mb-1 text-sm">{itemName}</h3>
                         <p className="text-primary font-semibold text-sm">
                           {itemPrice.toLocaleString()}원
@@ -326,7 +337,7 @@ const SearchPage = () => {
             <div className="flex-1">
               <p className="text-sm text-gray-600 mb-1">선택된 아이템</p>
               <p className="font-semibold text-gray-900">
-                {selectedItem.name || selectedItem.itemName || selectedItem.title || 'Item'}
+                {selectedItem.name || selectedItem.itemName || selectedItem.title || '메뉴'}
               </p>
               <p className="text-primary font-semibold text-sm mt-1">
                 {(selectedItem.price || selectedItem.itemPrice || 0).toLocaleString()}원
@@ -341,7 +352,7 @@ const SearchPage = () => {
           </div>
           <button
             onClick={() => {
-              const itemName = selectedItem.name || selectedItem.itemName || selectedItem.title || 'Item';
+              const itemName = selectedItem.name || selectedItem.itemName || selectedItem.title || '메뉴';
               const itemPrice = selectedItem.price || selectedItem.itemPrice || 0;
               
               addItem({
