@@ -284,6 +284,67 @@ app.patch('/api/users/:userId', async (req, res) => {
   }
 });
 
+// ========== Store Managers API ==========
+// 매장 관리자 로그인
+app.post('/api/store-managers/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: '아이디와 비밀번호를 입력해주세요.' });
+    }
+
+    const manager = await db.collection('store-managers').findOne({ username });
+    
+    if (!manager) {
+      return res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+    }
+
+    // 비밀번호 확인 (실제로는 해시된 비밀번호를 비교해야 함)
+    if (manager.password !== password) {
+      return res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+    }
+
+    // 로그인 성공 (실제로는 JWT 토큰 등을 발급해야 함)
+    res.json({
+      success: true,
+      manager: {
+        id: manager._id.toString(),
+        username: manager.username,
+        brandId: manager.brandId,
+        brandName: manager.brandName,
+        stadiumId: manager.stadiumId,
+        stadiumName: manager.stadiumName
+      }
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: '로그인 중 오류가 발생했습니다.' });
+  }
+});
+
+// 매장 관리자 조회
+app.get('/api/store-managers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const manager = await db.collection('store-managers').findOne({ _id: new ObjectId(id) });
+    if (!manager) {
+      return res.status(404).json({ error: '매장 관리자를 찾을 수 없습니다.' });
+    }
+    res.json({
+      id: manager._id.toString(),
+      username: manager.username,
+      brandId: manager.brandId,
+      brandName: manager.brandName,
+      stadiumId: manager.stadiumId,
+      stadiumName: manager.stadiumName
+    });
+  } catch (error) {
+    console.error('Error fetching store manager:', error);
+    res.status(500).json({ error: '매장 관리자 조회 중 오류가 발생했습니다.' });
+  }
+});
+
 // 서버 시작
 app.listen(PORT, () => {
   console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);

@@ -1,14 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../lib/firebase';
 import { api } from '../lib/mongodb';
 import { formatPhoneNumber } from '../utils/phoneUtils';
+import { ArrowLeft } from 'lucide-react';
 
 const ProfilePage = () => {
   const [user] = useAuthState(auth);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -32,7 +34,15 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-white pb-24">
       <div className="px-4 py-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900">프로필</h1>
+        <div className="flex items-center">
+          <button 
+            onClick={() => navigate('/mypage')}
+            className="mr-4"
+          >
+            <ArrowLeft size={24} className="text-gray-700" />
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900 flex-1">프로필</h1>
+        </div>
       </div>
 
       <div className="px-4 py-6">

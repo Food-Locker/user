@@ -231,7 +231,7 @@ const HomePage = () => {
               {/* Content */}
               <div className="p-4 pb-16">
                 <h3 className="font-bold text-gray-900 mb-2 text-base">{item.name}</h3>
-                <div className="flex items-baseline gap-2 pr-14">
+                <div className="flex flex-col gap-1">
                   <span className="text-xs text-gray-500 font-medium">{item.description}</span>
                   <span className="text-primary font-bold text-lg">${item.price}</span>
                 </div>

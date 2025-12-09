@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/mongodb';
 import { auth } from '../lib/firebase';
@@ -14,6 +14,22 @@ const PaymentPage = () => {
   const [paymentMethod, setPaymentMethod] = useState(''); // 결제수단
   const [loading, setLoading] = useState(false);
   const [showSeatModal, setShowSeatModal] = useState(false);
+  const [stadiumId, setStadiumId] = useState(null);
+
+  // 첫 번째 stadium 가져오기 (주문에 stadiumId 포함용)
+  useEffect(() => {
+    const fetchStadium = async () => {
+      try {
+        const stadiums = await api.getStadiums();
+        if (stadiums.length > 0) {
+          setStadiumId(stadiums[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching stadium:', error);
+      }
+    };
+    fetchStadium();
+  }, []);
 
   const menuTotal = getTotal();
   const deliveryFee = deliveryMethod === 'locker' ? 1000 : deliveryMethod === 'seat' ? 2500 : 0;
@@ -46,6 +62,7 @@ const PaymentPage = () => {
         paymentMethod,
         total: finalTotal,
         status: 'received', // 초기 상태: 접수됨
+        stadiumId: stadiumId, // 야구장 정보 추가
       };
 
       // MongoDB API에 주문 추가
