@@ -361,6 +361,7 @@ const SearchPage = () => {
                 price: itemPrice,
                 quantity: 1,
                 image: getImagePath(itemName),
+                brandId: selectedBrand?.id || selectedItem.brandId,
                 options: {}
               });
               

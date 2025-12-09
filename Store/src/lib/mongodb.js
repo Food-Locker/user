@@ -9,10 +9,11 @@ export const api = {
     return response.json();
   },
 
-  getOrders: async (userId, status) => {
+  getOrders: async (userId, status, brandId) => {
     const params = new URLSearchParams();
     if (userId) params.append('userId', userId);
     if (status) params.append('status', status);
+    if (brandId) params.append('brandId', brandId);
     const response = await fetch(`${API_BASE_URL}/api/orders?${params.toString()}`);
     if (!response.ok) throw new Error('주문을 가져오는 중 오류가 발생했습니다.');
     return response.json();

@@ -27,9 +27,16 @@ const DeliveryStatusPage = () => {
     },
     {
       id: 'completed',
-      label: '완료',
-      title: '락커에서 수령 가능합니다.',
+      label: '조리 완료',
+      title: '조리가 완료되었습니다.',
       icon: CheckCircle2,
+      status: '대기'
+    },
+    {
+      id: 'delivered',
+      label: '배달 완료',
+      title: '락커에서 수령 가능합니다.',
+      icon: Package,
       status: '대기'
     }
   ];
@@ -83,7 +90,8 @@ const DeliveryStatusPage = () => {
       'pending': 0,
       'cooking': 1,
       'completed': 2,
-      'done': 2
+      'delivered': 3,
+      'done': 3
     };
     
     return statusMap[status] || 0;

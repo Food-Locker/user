@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock, UtensilsCrossed, CheckCircle2, RefreshCw, Home, Users, LogOut, MapPin } from 'lucide-react';
+import { Clock, UtensilsCrossed, CheckCircle2, RefreshCw, Home, Users, LogOut, MapPin, Package } from 'lucide-react';
 import { api } from '../lib/mongodb';
 
 const StoreOrderPage = ({ manager, onLogout }) => {
@@ -8,14 +8,15 @@ const StoreOrderPage = ({ manager, onLogout }) => {
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [stadiums, setStadiums] = useState([]);
 
-  // 주문 목록 가져오기 (received, cooking 상태만)
+  // 주문 목록 가져오기 (received, cooking, completed 상태, 로그인한 매니저의 brandId로 필터링)
   const fetchOrders = async () => {
     try {
-      // 파라미터 없이 모든 주문 가져오기
-      const allOrders = await api.getOrders(null, null);
-      // received, cooking 상태만 필터링
+      // 로그인한 매니저의 brandId로 필터링하여 주문 가져오기
+      const brandId = manager?.brandId;
+      const allOrders = await api.getOrders(null, null, brandId);
+      // received, cooking, completed 상태만 필터링 (delivered는 제외)
       const activeOrders = allOrders.filter(
-        order => order.status === 'received' || order.status === 'cooking'
+        order => order.status === 'received' || order.status === 'cooking' || order.status === 'completed'
       );
       // 최신 주문부터 정렬
       activeOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -45,7 +46,7 @@ const StoreOrderPage = ({ manager, onLogout }) => {
     const intervalId = setInterval(fetchOrders, 3000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [manager?.brandId]);
 
   // Stadium 이름 가져오기
   const getStadiumName = (stadiumId) => {
@@ -111,6 +112,26 @@ const StoreOrderPage = ({ manager, onLogout }) => {
           )}
         </button>
       );
+    } else if (order.status === 'completed') {
+      return (
+        <button
+          onClick={() => handleStatusUpdate(order.id, 'delivered')}
+          disabled={updatingOrderId === order.id}
+          className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-md"
+        >
+          {updatingOrderId === order.id ? (
+            <>
+              <RefreshCw size={16} className="animate-spin" />
+              처리 중...
+            </>
+          ) : (
+            <>
+              <Package size={16} />
+              락커 배달 완료
+            </>
+          )}
+        </button>
+      );
     }
     return null;
   };
@@ -132,9 +153,15 @@ const StoreOrderPage = ({ manager, onLogout }) => {
         };
       case 'completed':
         return {
-          text: '완료',
+          text: '조리 완료',
           color: 'bg-green-100 text-green-700 border border-green-200',
           icon: CheckCircle2
+        };
+      case 'delivered':
+        return {
+          text: '배달 완료',
+          color: 'bg-blue-100 text-blue-700 border border-blue-200',
+          icon: Package
         };
       default:
         return {
@@ -195,7 +222,7 @@ const StoreOrderPage = ({ manager, onLogout }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 shadow-soft hover:shadow-medium transition-all hover:border-primary/20">
             <div className="flex items-center justify-between">
               <div>
@@ -219,6 +246,19 @@ const StoreOrderPage = ({ manager, onLogout }) => {
               </div>
               <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center">
                 <UtensilsCrossed size={26} className="text-primary" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 shadow-soft hover:shadow-medium transition-all hover:border-primary/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">조리 완료</p>
+                <p className="text-3xl font-bold text-primary">
+                  {orders.filter(o => o.status === 'completed').length}
+                </p>
+              </div>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl flex items-center justify-center">
+                <CheckCircle2 size={26} className="text-primary" />
               </div>
             </div>
           </div>

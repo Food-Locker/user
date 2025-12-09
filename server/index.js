@@ -40,7 +40,16 @@ async function connectDB() {
   }
 }
 
-connectDB();
+// MongoDB 연결 확인 미들웨어
+const checkDBConnection = (req, res, next) => {
+  if (!db) {
+    return res.status(503).json({ error: '데이터베이스 연결 중입니다. 잠시 후 다시 시도해주세요.' });
+  }
+  next();
+};
+
+// 모든 API 엔드포인트에 DB 연결 확인 미들웨어 적용
+app.use('/api', checkDBConnection);
 
 // ========== Stadiums API ==========
 // 모든 Stadiums 가져오기
@@ -92,7 +101,11 @@ app.get('/api/brands/:brandId/items', async (req, res) => {
     const items = await db.collection('items')
       .find({ brandId: new ObjectId(brandId) })
       .toArray();
-    res.json(items.map(i => ({ ...i, id: i._id.toString() })));
+    res.json(items.map(i => ({ 
+      ...i, 
+      id: i._id.toString(),
+      brandId: i.brandId ? i.brandId.toString() : brandId
+    })));
   } catch (error) {
     console.error('Error fetching items:', error);
     res.status(500).json({ error: 'Items를 가져오는 중 오류가 발생했습니다.' });
@@ -121,7 +134,11 @@ app.get('/api/items', async (req, res) => {
       items = await db.collection('items').find({}).toArray();
     }
     
-    res.json(items.map(i => ({ ...i, id: i._id.toString() })));
+    res.json(items.map(i => ({ 
+      ...i, 
+      id: i._id.toString(),
+      brandId: i.brandId ? i.brandId.toString() : null
+    })));
   } catch (error) {
     console.error('Error fetching items:', error);
     res.status(500).json({ error: 'Items를 가져오는 중 오류가 발생했습니다.' });
@@ -163,7 +180,7 @@ app.get('/api/orders/:orderId', async (req, res) => {
 // 사용자의 진행중인 주문 가져오기
 app.get('/api/orders', async (req, res) => {
   try {
-    const { userId, status } = req.query;
+    const { userId, status, brandId } = req.query;
     let query = {};
     if (userId) {
       query.userId = userId;
@@ -175,6 +192,12 @@ app.get('/api/orders', async (req, res) => {
         query.status = status;
       }
     }
+    // brandId로 필터링 (주문의 brandIds 배열에 해당 brandId가 포함된 경우)
+    if (brandId) {
+      // MongoDB에서 배열 필드에 특정 값이 포함되어 있는지 확인
+      query.brandIds = brandId;
+    }
+    
     const orders = await db.collection('orders')
       .find(query)
       .sort({ createdAt: -1 })
@@ -345,8 +368,13 @@ app.get('/api/store-managers/:id', async (req, res) => {
   }
 });
 
-// 서버 시작
-app.listen(PORT, () => {
-  console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+// MongoDB 연결 후 서버 시작
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
+  });
+}).catch((error) => {
+  console.error('서버 시작 실패:', error);
+  process.exit(1);
 });
 

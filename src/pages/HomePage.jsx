@@ -72,7 +72,8 @@ const HomePage = () => {
             price: item.price || item.itemPrice || 0,
             image: getImagePath(itemName) || '/hamburger.png',
             description: item.description || 'Starting From',
-            categoryId: selectedCategory
+            categoryId: selectedCategory,
+            brandId: item.brandId // brandId 명시적으로 포함
           };
         });
         
@@ -97,6 +98,7 @@ const HomePage = () => {
       price: item.price,
       quantity: 1,
       image: item.image,
+      brandId: item.brandId,
     });
   };
 

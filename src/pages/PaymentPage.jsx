@@ -52,6 +52,9 @@ const PaymentPage = () => {
     setLoading(true);
 
     try {
+      // 주문에 포함된 모든 brandId 추출 (중복 제거)
+      const brandIds = [...new Set(items.map(item => item.brandId).filter(Boolean))];
+      
       // MongoDB에 주문 정보 저장
       const orderData = {
         userId: auth.currentUser?.uid || 'anonymous',
@@ -63,6 +66,7 @@ const PaymentPage = () => {
         total: finalTotal,
         status: 'received', // 초기 상태: 접수됨
         stadiumId: stadiumId, // 야구장 정보 추가
+        brandIds: brandIds, // 주문에 포함된 브랜드 ID 배열
       };
 
       // MongoDB API에 주문 추가
