@@ -6,8 +6,8 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// 상위 디렉토리의 .env 파일 읽기
-dotenv.config({ path: join(__dirname, '../.env') });
+// 같은 디렉토리의 .env 파일 읽기
+dotenv.config({ path: join(__dirname, '.env') });
 
 const uri = process.env.MONGODB_URI;
 if (!uri) {
@@ -32,7 +32,7 @@ async function seedStoreManagers() {
     console.log(`${brands.length}개의 Brands 발견`);
 
     if (brands.length === 0) {
-      console.log('⚠️ Brands가 없습니다. 먼저 server/seed.js를 실행하여 데이터를 생성해주세요.');
+      console.log('⚠️ Brands가 없습니다. 먼저 backend 프로젝트의 seed.js를 실행하여 데이터를 생성해주세요.');
       return;
     }
 
